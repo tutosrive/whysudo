@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.srm.testxml"
+    namespace = "com.srm.whysudo"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.srm.testxml"
+        applicationId = "com.srm.whysudo"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -22,11 +22,14 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
         }
     }
     compileOptions {

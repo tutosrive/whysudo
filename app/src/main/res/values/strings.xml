@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">testxml</string>
+    <string name="app_name">Why Sudo?</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
@@ -16,4 +16,10 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="about_page_title">About</string>
+    <string name="settings_page_title">Settings</string>
+    <string name="label_user_name">Name:</string>
+    <string name="username_example">Santiago</string>
+    <string name="default_button_text">Click Me!</string>
+    <string name="about_info_when_pressed">About Title has been Pressed!</string>
 </resources>

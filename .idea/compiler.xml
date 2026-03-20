@@ -4,5 +4,6 @@
     <option name="BUILD_PROCESS_HEAP_SIZE" value="3072" />
     <option name="BUILD_PROCESS_ADDITIONAL_VM_OPTIONS" value="-XX:+UseParallelGC -Xms1024m -Xmx3072m" />
     <option name="PARALLEL_COMPILATION_OPTION" value="Enabled" />
+    <bytecodeTargetLevel target="21" />
   </component>
 </project>

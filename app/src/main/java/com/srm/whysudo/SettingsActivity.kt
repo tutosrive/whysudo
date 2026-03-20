@@ -1,6 +1,7 @@
-package com.srm.testxml
+package com.srm.whysudo
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 
@@ -16,6 +17,10 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    fun changeView(view: View){
+        setContentView(R.layout.activity_main)
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

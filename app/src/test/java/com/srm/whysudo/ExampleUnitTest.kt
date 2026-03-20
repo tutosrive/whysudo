@@ -1,4 +1,4 @@
-package com.srm.testxml
+package com.srm.whysudo
 
 import org.junit.Test
 
