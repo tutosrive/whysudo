@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("Unused")
     fun goAbout(view: View) {
         val intent = Intent(this, About::class.java)
         startActivity(intent)
