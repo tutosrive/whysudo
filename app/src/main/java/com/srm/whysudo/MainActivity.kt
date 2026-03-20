@@ -1,5 +1,20 @@
+/*
+ * Copyright (c) 2026 tutosrive. All rights reserved.
+ *
+ * Author: tutosrive
+ * GitHub: https://github.com/tutosrive
+ *
+ * This source code is PROPRIETARY and CONFIDENTIAL.
+ * Unauthorized copying, modification, or distribution of this file,
+ * via any medium, is strictly prohibited.
+ *
+ * This software is provided "as is", without warranty of any kind.
+ * In no event shall the author be liable for any claim or damages.
+ */
+
 package com.srm.whysudo
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -19,7 +34,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun changeView(view: View){
-        setContentView(R.layout.activity_about)
+    fun goAbout(view: View) {
+        val intent = Intent(this, About::class.java)
+        startActivity(intent)
     }
 }
