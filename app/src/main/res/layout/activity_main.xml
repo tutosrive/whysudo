@@ -18,6 +18,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/stacked_waves_haikei_pruple"
     android:orientation="vertical"
     android:padding="10dp"
     tools:context=".MainActivity">
@@ -51,6 +52,7 @@
                 android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/footer_message"
+                android:textColor="@color/on_surface"
                 android:textSize="11sp" />
         </LinearLayout>
 
@@ -77,6 +79,7 @@
                     android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/app_name"
+                    android:textColor="@color/dark_secondary"
                     android:textSize="16sp" />
 
             </LinearLayout>
@@ -85,29 +88,37 @@
                 android:id="@+id/searchLayoutContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="10dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/searchInpLayout"
                     android:layout_width="300dp"
-                    android:layout_height="48dp">
+                    android:layout_height="wrap_content"
+                    android:background="#00FFFFFF"
+                    android:padding="10dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/searchInp"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_marginEnd="5dp"
+                        android:drawableTint="#FA0000"
                         android:fontFamily="monospace"
                         android:hint="@string/input_search_main_hint"
-                        android:inputType="text|textFilter|textAutoComplete" />
+                        android:inputType="text|textFilter|textAutoComplete"
+                        android:textColor="@color/secondary_container"
+                        android:textColorHint="@color/secondary_container" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageButton
-                    android:id="@+id/imageButton2"
+                    android:id="@+id/searchBtn"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:backgroundTint="#00FFFFFF"
                     android:contentDescription="@string/search_btn_description"
+                    android:onClick="searchCommand"
                     app:srcCompat="@android:drawable/ic_menu_search" />
             </LinearLayout>
 
@@ -127,9 +138,9 @@
                         android:id="@+id/infoTextMain"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:gravity="center"
                         android:padding="10dp"
-                        android:singleLine="false" />
+                        android:singleLine="false"
+                        android:textColor="@color/dark_secondary" />
                 </LinearLayout>
             </ScrollView>
 

@@ -15,10 +15,12 @@
 package com.srm.whysudo
 
 import android.os.Bundle
+import android.text.Html
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +28,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class About : AppCompatActivity() {
+    private lateinit var infoText: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,12 +40,11 @@ class About : AppCompatActivity() {
             insets
         }
 
+        infoText = findViewById<TextView>(R.id.infoText)
         loadInfoAbout()
     }
 
     fun ctaClick(view: View) {
-        // Just a joke!
-        val infoText = findViewById<TextView>(R.id.infoText)
         infoText.text = "¿Por qué habrías de hacerlo?, un click en ¿un título?, ¿enserio?"
         lifecycleScope.launch {
             delay(1000)
@@ -50,9 +53,8 @@ class About : AppCompatActivity() {
     }
 
     private fun loadInfoAbout(): Unit {
-        val infoText = findViewById<TextView>(R.id.infoText)
         val contentFileAbout = assets.open("about.srm").bufferedReader().use { it.readText() }
-        infoText.text = contentFileAbout
+        infoText.text = HtmlCompat.fromHtml(contentFileAbout, HtmlCompat.FROM_HTML_MODE_COMPACT)
     }
 
     fun close(view: View) {

@@ -1,23 +1,49 @@
-This is a simple test to create my fucking app!
+<div>
+   <p><strong>Developer:</strong> Tutos Rive</p>
+   <p><strong>Project:</strong> Why Sudo?</p>
+   <p><strong>Copyright:</strong> &copy; 2026 Tutos Rive. All Rights Reserved.</p>
+</div>
 
-MIT License
+<p>
+   <strong>PROPRIETARY AND CONFIDENTIAL NOTICE</strong>
+</p>
 
-Copyright (c) 2025 Tutos Rive
+<p>
+   This software, including all source code, documentation, and digital assets associated with
+   <strong>"Why Sudo?"</strong>, is the sole and exclusive property of <strong>Tutos Rive</strong>.
+</p>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+<p>
+   Any unauthorized access, use, reproduction, or distribution of this software is strictly prohibited
+   without express written consent from the copyright holder.
+</p>
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+<p>
+   By installing or using this application, you agree to the following terms:
+</p>
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+<ul>
+   <li>
+      <strong>Restricted License:</strong>
+      You are granted a personal, non-exclusive, non-transferable license to use this software
+      for its intended purposes as provided via official distribution channels.
+   </li>
+
+   <li>
+      <strong>Prohibited Actions:</strong>
+      You may not modify, copy, distribute, sell, sublicense, or create derivative works
+      based on this software.
+   </li>
+
+   <li>
+      <strong>No Reverse Engineering:</strong>
+      Decompilation, disassembly, or reverse engineering of the application’s binary code
+      or logic is strictly forbidden.
+   </li>
+
+   <li>
+      <strong>Intellectual Property:</strong>
+      All trademarks, logos, and brand names, including <strong>"Why Sudo?"</strong> and
+      <strong>"Tutos Rive"</strong>, are protected under intellectual property laws.
+   </li>
+</ul>

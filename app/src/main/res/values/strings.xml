@@ -37,7 +37,7 @@
     <string name="accept_btn_text">Accept</string>
     <string name="close_btn_text">Close</string>
     <string name="about_btn_description">Go to About section</string>
-    <string name="input_search_main_hint">sudo</string>
+    <string name="input_search_main_hint">search</string>
     <string name="footer_message">© 2026 - tutosrive</string>
     <string name="search_btn_description">Search the command typed</string>
 </resources>
