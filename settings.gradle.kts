@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "testxml"
+rootProject.name = "whysudo"
 include(":app")

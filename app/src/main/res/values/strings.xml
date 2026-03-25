@@ -1,5 +1,19 @@
+<!--
+  ~ Copyright (c) 2026 tutosrive. All rights reserved.
+  ~
+  ~ Author: tutosrive
+  ~ GitHub: https://github.com/tutosrive
+  ~
+  ~ This source code is PROPRIETARY and CONFIDENTIAL.
+  ~ Unauthorized copying, modification, or distribution of this file,
+  ~ via any medium, is strictly prohibited.
+  ~
+  ~ This software is provided "as is", without warranty of any kind.
+  ~ In no event shall the author be liable for any claim or damages.
+  -->
+
 <resources>
-    <string name="app_name">testxml</string>
+    <string name="app_name">Why Sudo?</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
@@ -16,4 +30,17 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="about_page_title">About</string>
+    <string name="settings_page_title">Settings</string>
+    <string name="default_button_text">Click Me!</string>
+    <string name="about_info_when_pressed">About Title has been Pressed!</string>
+    <string name="accept_btn_text">Accept</string>
+    <string name="close_btn_text">Close</string>
+    <string name="about_btn_description">Go to About section</string>
+    <string name="input_search_main_hint">search</string>
+    <string name="footer_message">© 2026 - tutosrive</string>
+    <string name="search_btn_description">Search the command typed</string>
+    <string name="hint_main_info_command">Try Search a command: `apt`</string>
+    <string name="loading_msg">Loading...</string>
+    <string name="try_reload_msg">Sorry, try reload again...</string>
 </resources>
