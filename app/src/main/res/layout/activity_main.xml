@@ -40,8 +40,9 @@
         <LinearLayout
             android:id="@+id/footerLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="bottom|center"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
@@ -60,6 +61,7 @@
             android:id="@+id/mainVLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="25dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
             android:padding="10dp">
@@ -68,7 +70,7 @@
                 android:id="@+id/titleLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -93,7 +95,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/searchInpLayout"
-                    android:layout_width="300dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#00FFFFFF"
                     android:padding="10dp">
@@ -111,38 +113,27 @@
                         android:textColorHint="@color/secondary_container" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <ImageButton
-                    android:id="@+id/searchBtn"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:backgroundTint="#00FFFFFF"
-                    android:contentDescription="@string/search_btn_description"
-                    android:onClick="searchCommand"
-                    app:srcCompat="@android:drawable/ic_menu_search" />
             </LinearLayout>
 
-            <ScrollView
+            <LinearLayout
+                android:id="@+id/layoutTextInfo"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp">
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background"
+                android:backgroundTint="@color/background_dark_glass"
+                android:orientation="vertical"
+                android:padding="10dp">
 
-                <LinearLayout
-                    android:id="@+id/layoutTextInfo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/infoTextMain"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:padding="10dp"
-                        android:singleLine="false"
-                        android:textColor="@color/dark_secondary" />
-                </LinearLayout>
-            </ScrollView>
+                <TextView
+                    android:id="@+id/infoTextMain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:hint="@string/hint_main_info_command"
+                    android:padding="10dp"
+                    android:singleLine="false"
+                    android:textColor="@color/dark_secondary"
+                    android:textColorHint="@color/dark_secondary" />
+            </LinearLayout>
 
         </LinearLayout>
 

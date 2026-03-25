@@ -16,7 +16,6 @@ package com.srm.whysudo
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextWatcher
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
@@ -26,11 +25,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.textfield.TextInputEditText
+import com.srm.whysudo.utils.DataManager
+import com.srm.whysudo.utils.MarkwonManager
+import org.json.JSONException
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
-    private lateinit var btnSearch: ImageButton
     private lateinit var commandInfoText: TextView
+    private lateinit var markman: MarkwonManager
+    private lateinit var dataman: DataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,17 +46,13 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        markman = MarkwonManager(this)
+        dataman = DataManager(this, "whysudo.srm")
+
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
-        btnSearch = findViewById<ImageButton>(R.id.searchBtn)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
 
         addListenerEvent()
-    }
-
-    private fun searchCommand(view: View): Unit {
-        val inpText = inputCommandSearch.text
-        commandInfoText.text = "Search: ${inpText}"
-        inputCommandSearch.clearFocus()
     }
 
     private fun addListenerEvent(): Unit {
@@ -64,11 +64,22 @@ class MainActivity : AppCompatActivity() {
                 count
             )
         }
-        btnSearch.setOnClickListener { searchCommand(it) }
     }
 
-    private fun changeRealTimeText(text: CharSequence?, start: Int, before: Int, count: Int): Unit {
-        commandInfoText.text = text.toString()
+    private fun changeRealTimeText(text: CharSequence?, start: Int, before: Int, count: Int) {
+        val command: String = (text ?: "").trim().toString()
+
+        if (!command.isEmpty()) {
+            var commandContent: String
+
+            try {
+                val fileObj: JSONObject = dataman.getJsonByKey(command)
+                commandContent = dataman.getContentString(fileObj)
+            } catch (error: JSONException) {
+                commandContent = ""
+            }
+            markman.setMark(commandContent, commandInfoText)
+        }
     }
 
     @Suppress("Unused")

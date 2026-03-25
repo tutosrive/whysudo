@@ -17,7 +17,6 @@
         <option name="resolveExternalAnnotations" value="true" />
       </GradleProjectSettings>
     </option>
-    <option name="offlineMode" value="true" />
     <option name="parallelModelFetch" value="true" />
   </component>
 </project>

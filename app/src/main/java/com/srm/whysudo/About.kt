@@ -15,20 +15,24 @@
 package com.srm.whysudo
 
 import android.os.Bundle
-import android.text.Html
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.srm.whysudo.utils.DataManager
+import com.srm.whysudo.utils.MarkwonManager
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class About : AppCompatActivity() {
     private lateinit var infoText: TextView
+    private lateinit var markmanAbout: MarkwonManager
+    private lateinit var datamanAbout: DataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,21 +44,37 @@ class About : AppCompatActivity() {
             insets
         }
 
+        markmanAbout = MarkwonManager(this)
+        datamanAbout = DataManager(this, "about.srm")
+
         infoText = findViewById<TextView>(R.id.infoText)
         loadInfoAbout()
     }
 
     fun ctaClick(view: View) {
-        infoText.text = "¿Por qué habrías de hacerlo?, un click en ¿un título?, ¿enserio?"
+        markmanAbout.setMark(
+            "¿Por qué habrías de hacerlo?, un click en ¿un título?, ¿enserio?",
+            infoText
+        )
         lifecycleScope.launch {
             delay(1000)
             loadInfoAbout()
         }
     }
 
-    private fun loadInfoAbout(): Unit {
-        val contentFileAbout = assets.open("about.srm").bufferedReader().use { it.readText() }
-        infoText.text = HtmlCompat.fromHtml(contentFileAbout, HtmlCompat.FROM_HTML_MODE_COMPACT)
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun loadInfoAbout() {
+        var contentFileAbout = getString(R.string.loading_msg)
+        markmanAbout.setMark(contentFileAbout, infoText)
+        lifecycleScope.launch {
+            delay(1000)
+            contentFileAbout = try {
+                datamanAbout.getContentString(datamanAbout.getData(), "en")
+            } catch (error: Exception) {
+                getString(R.string.try_reload_msg) + error.message.toString()
+            }
+            markmanAbout.setMark(contentFileAbout, infoText)
+        }
     }
 
     fun close(view: View) {

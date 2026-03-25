@@ -40,4 +40,7 @@
     <string name="input_search_main_hint">search</string>
     <string name="footer_message">© 2026 - tutosrive</string>
     <string name="search_btn_description">Search the command typed</string>
+    <string name="hint_main_info_command">Try Search a command: `apt`</string>
+    <string name="loading_msg">Loading...</string>
+    <string name="try_reload_msg">Sorry, try reload again...</string>
 </resources>
