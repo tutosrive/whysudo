@@ -25,7 +25,6 @@ import androidx.lifecycle.lifecycleScope
 import com.srm.whysudo.utils.DataManager
 import com.srm.whysudo.utils.MarkwonManager
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

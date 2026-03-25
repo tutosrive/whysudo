@@ -19,7 +19,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 
 class DataManager(private val ctx: Context, val fileDataName: String) {
