@@ -15,12 +15,8 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import android.text.Spanned
 import android.widget.TextView
 import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonConfiguration
-import io.noties.markwon.MarkwonPlugin
-import org.commonmark.node.Node
 
 class MarkwonManager(ctx: Context) {
     val mark: Markwon = Markwon.create(ctx)

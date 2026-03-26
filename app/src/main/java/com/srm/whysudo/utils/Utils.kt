@@ -15,7 +15,9 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
+import android.widget.TextView
 import java.io.InputStream
+import java.util.Calendar
 
 object Utils {
     fun loadAssetFile(ctx: Context, filename: String): InputStream {
@@ -26,5 +28,21 @@ object Utils {
     fun readAssetTextFile(ctx: Context, filename: String): String {
         val read = loadAssetFile(ctx, filename).bufferedReader().use { it.readText() }
         return read
+    }
+
+    fun getNow(): Calendar {
+        val now = Calendar.getInstance()
+        return now
+    }
+
+    fun getNowYear(): Int {
+        return getNow().get(Calendar.YEAR)
+    }
+
+    fun setFooterContent(footer: TextView, strFooter: String, markman: MarkwonManager) {
+        val year: Int = getNowYear()
+        var text: String = ""
+        if (strFooter.contains("YEAR")) text = strFooter.replace("YEAR", "$year")
+        markman.setMark(text, footer)
     }
 }
