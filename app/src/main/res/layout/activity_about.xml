@@ -64,7 +64,7 @@
                     android:gravity="center"
                     android:onClick="ctaClick"
                     android:text="@string/about_page_title"
-                    android:textColor="@color/dark_secondary" />
+                    android:textColor="@color/text_color_on_dark" />
 
             </LinearLayout>
 
@@ -85,7 +85,7 @@
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:singleLine="false"
-                    android:textColor="@color/dark_secondary" />
+                    android:textColor="@color/text_color_on_dark" />
             </LinearLayout>
 
         </LinearLayout>

@@ -13,7 +13,7 @@
   -->
 
 <resources>
-    <color name="dark_secondary">#f95118</color>
+    <color name="text_color_on_dark">#22CED4</color>
 
     <color name="secondary_container">#8a2d00</color>
 
