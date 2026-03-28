@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity() {
             try {
                 val fileObj: JSONObject = dataman.getJsonByKey(command)
                 commandContent = dataman.getContentString(fileObj)
-                inputCommandSearch.clearFocus()
             } catch (error: JSONException) {
                 commandContent = getString(R.string.hint_main_info_command)
             }
