@@ -24,18 +24,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
-import com.srm.whysudo.utils.DataManager
+import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.MarkwonManager
 import com.srm.whysudo.utils.Utils
-import org.json.JSONException
-import org.json.JSONObject
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
     private lateinit var commandInfoText: TextView
     private lateinit var markman: MarkwonManager
-    private lateinit var dataman: DataManager
+    private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,15 +50,20 @@ class MainActivity : AppCompatActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        markman = MarkwonManager(this)
-        dataman = DataManager(this, "whysudo.srm")
 
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
         footerTxt = findViewById<TextView>(R.id.footerText)
-
+        markman = MarkwonManager(this)
         loadFooterDate()
-        addListenerEvent()
+
+        dbDataManager = DBDataManager(this, { loadingStatus() }, { addListenerEvent() })
+    }
+
+    fun loadingStatus(): Unit {
+        commandInfoText.text = getString(R.string.loading_msg)
+        inputCommandSearch.isEnabled = false
+        inputCommandSearch.hint = "Loading Database..."
     }
 
     private fun loadFooterDate() {
@@ -67,6 +72,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addListenerEvent(): Unit {
+        commandInfoText.text = getString(R.string.hint_main_info_command)
+        inputCommandSearch.isEnabled = true
+        inputCommandSearch.hint = getString(R.string.input_search_main_hint)
         inputCommandSearch.doOnTextChanged { text, start, before, count ->
             changeRealTimeText(
                 text,
@@ -81,13 +89,13 @@ class MainActivity : AppCompatActivity() {
         val command: String = (text ?: "").trim().toString()
 
         if (!command.isEmpty()) {
-            var commandContent: String
-
+            var commandContent: String = ""
             try {
-                val fileObj: JSONObject = dataman.getJsonByKey(command)
-                commandContent = dataman.getContentString(fileObj)
-            } catch (error: JSONException) {
-                commandContent = getString(R.string.hint_main_info_command)
+                lifecycleScope.launch {
+                    commandContent += dbDataManager.dbGetCommandContent(command)
+                }
+            } catch (error: Exception) {
+                commandContent += getString(R.string.hint_main_info_command)
             }
             markman.setMark(commandContent, commandInfoText)
         }

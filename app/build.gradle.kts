@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-val versionApp = "0.2.2"
+val versionApp = "0.2.3"
 
 base {
     archivesName.set("WhySudo-v$versionApp")
@@ -40,14 +40,43 @@ android {
         versionCode = 1
     }
 
+    splits {
+        abi {
+            isEnable = true // En KTS se usa 'isEnable' para el bloque splits
+            reset() // Reinicia la lista de arquitecturas por defecto
+            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+            // Define si se genera un APK que contenga todas las arquitecturas
+            isUniversalApk = false
+        }
+    }
+
+    bundle {
+        language {
+            enableSplit = true // Splits APKs based on user's language
+        }
+        density {
+            enableSplit = true // Splits APKs based on screen density (e.g., hdpi, xxhdpi)
+        }
+        abi {
+            enableSplit = true // Splits APKs based on CPU architecture (e.g., arm64-v8a, x86_64)
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             applicationIdSuffix = ".r"
+
+            packaging {
+                jniLibs {
+                    useLegacyPackaging = false
+                }
+            }
         }
         getByName("debug") {
             applicationIdSuffix = ".d"
@@ -71,4 +100,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation("io.noties.markwon:core:4.6.2")
+    // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite-bundled
+    implementation("androidx.sqlite:sqlite-bundled:2.6.2")
 }
