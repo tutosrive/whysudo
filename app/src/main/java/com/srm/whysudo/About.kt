@@ -23,8 +23,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.srm.whysudo.utils.DataManager
+import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.utils.MarkwonManager
+import com.srm.whysudo.utils.RawDataManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.delay
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 class About : AppCompatActivity() {
     private lateinit var infoText: TextView
     private lateinit var markmanAbout: MarkwonManager
-    private lateinit var datamanAbout: DataManager
+    private lateinit var rawDatamanAbout: RawDataManager
     private lateinit var footerText: TextView
     private lateinit var appVersion: String
 
@@ -50,7 +51,7 @@ class About : AppCompatActivity() {
 
         appVersion = packageManager.getPackageInfo(packageName, 0).versionName.toString()
         markmanAbout = MarkwonManager(this)
-        datamanAbout = DataManager(this, "about.srm")
+        rawDatamanAbout = RawDataManager(this, DataFileName.ABOUT())
 
         infoText = findViewById<TextView>(R.id.infoText)
         footerText = findViewById<TextView>(R.id.footerAbout)
@@ -82,7 +83,7 @@ class About : AppCompatActivity() {
         lifecycleScope.launch {
             delay(100)
             contentFileAbout = try {
-                datamanAbout.getContentString(datamanAbout.getData(), "en")
+                rawDatamanAbout.getContentString(rawDatamanAbout.getData(), "en")
             } catch (error: Exception) {
                 getString(R.string.try_reload_msg) + error.message.toString()
             }
