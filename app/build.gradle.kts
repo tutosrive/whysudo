@@ -42,23 +42,23 @@ android {
 
     splits {
         abi {
-            isEnable = true // En KTS se usa 'isEnable' para el bloque splits
-            reset() // Reinicia la lista de arquitecturas por defecto
+            isEnable = true
+            reset()
             include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
-            // Define si se genera un APK que contenga todas las arquitecturas
             isUniversalApk = false
         }
     }
 
     bundle {
         language {
-            enableSplit = true // Splits APKs based on user's language
+            @Suppress("unstable")
+            enableSplit = true
         }
         density {
-            enableSplit = true // Splits APKs based on screen density (e.g., hdpi, xxhdpi)
+            enableSplit = true
         }
         abi {
-            enableSplit = true // Splits APKs based on CPU architecture (e.g., arm64-v8a, x86_64)
+            enableSplit = true
         }
     }
 

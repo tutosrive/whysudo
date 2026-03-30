@@ -17,6 +17,7 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -29,7 +30,15 @@ import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.MarkwonManager
 import com.srm.whysudo.utils.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
@@ -37,6 +46,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var markman: MarkwonManager
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
+    private val tag: String? = this::class.simpleName
+    val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
 
@@ -74,36 +85,58 @@ class MainActivity : AppCompatActivity() {
     private fun addListenerEvent(): Unit {
         commandInfoText.text = getString(R.string.hint_main_info_command)
         inputCommandSearch.isEnabled = true
+
         inputCommandSearch.hint = getString(R.string.input_search_main_hint)
-        inputCommandSearch.doOnTextChanged { text, start, before, count ->
-            changeRealTimeText(
-                text,
-                start,
-                before,
-                count
-            )
-        }
+        inputCommandSearch.doOnTextChanged { text, _, _, _ -> changeRealTimeText(text) }
     }
 
-    private fun changeRealTimeText(text: CharSequence?, start: Int, before: Int, count: Int) {
+    private fun changeRealTimeText(text: CharSequence?) {
         val command: String = (text ?: "").trim().toString()
 
-        if (!command.isEmpty()) {
-            var commandContent: String = ""
-            try {
-                lifecycleScope.launch {
-                    commandContent += dbDataManager.dbGetCommandContent(command)
+//        lifecycleScope.launch {
+//        mainScope.launch {
+
+        mainScope.launch {
+            if (!command.isEmpty()) {
+                var commandContent: List<String> = mutableListOf()
+//                var commandContent: String = ""
+                var commandTask: List<String>?
+//                var commandTask: Flow<String>?
+                try {
+//                    commandTask = async { dbDataManager.dbGetCommandContent(command) }
+                    commandTask = dbDataManager.dbGetCommandContent(command)
+
+                    commandContent = commandTask
+
+
+                    Log.i(tag, commandContent.toString())
+
+//                    Log.i(tag, commandContent.joinToString { "\n" })
+                } catch (error: Exception) {
+//                    commandContent = mutableListOf(getString(R.string.hint_main_info_command))
+                    commandContent =
+                        listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
                 }
-            } catch (error: Exception) {
-                commandContent += getString(R.string.hint_main_info_command)
+
+                try {
+                    markman.setMark(commandContent.toString(), commandInfoText)
+                } catch (error: Exception) {
+                    markman.setMark("${error.message}", commandInfoText)
+                }
+//                markman.setMark(commandContent, commandInfoText)
             }
-            markman.setMark(commandContent, commandInfoText)
         }
+//        }
     }
 
     @Suppress("Unused")
     fun goAbout(view: View): Unit {
         val intent = Intent(this, About::class.java)
         startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainScope.cancel()
     }
 }

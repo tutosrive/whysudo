@@ -19,9 +19,17 @@ import android.util.Log
 import androidx.sqlite.SQLiteConnection
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DBDataManager(
     private val ctx: Context,
@@ -52,25 +60,27 @@ class DBDataManager(
 
     @OptIn(DelicateCoroutinesApi::class)
     @Throws(Exception::class)
-    fun dbGetCommandContent(command: String): String {
-        var content: String = ""
-        val commandSplitted: List<String> = command.split("\\s+".toRegex())
-        val query = if (commandSplitted.size == 1) {
-            "SELECT COUNT(*), filename, content FROM file WHERE filename = '$command'"
-        } else {
-            "SELECT COUNT(*), filename, content FROM file WHERE id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
-                formatRegex(
-                    commandSplitted
-                )
-            }')"
-        }
+    suspend fun dbGetCommandContent(command: String): List<String> {
+//    fun dbGetCommandContent(command: String): Flow<List<String>> = flow {
+        return withContext(Dispatchers.IO) {
+            val content: MutableList<String> = mutableListOf<String>()
+//        var content = ""
+            val commandSplitted: List<String> = command.split("\\s+".toRegex())
+            val query = if (commandSplitted.size == 1) {
+                "SELECT filename, content FROM file WHERE filename = '$command'"
+            } else {
+                "SELECT filename, content FROM file WHERE id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
+                    formatRegex(
+                        commandSplitted
+                    )
+                }')"
+            }
 //        val query =
 //            "SELECT COUNT(*), filename, content FROM file WHERE filename = '$command' OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
 //                formatRegex(commandSplitted)
 //            }"
 
-        Log.d("[SQL QUERIES]", query)
-        db.prepare(query).use { statement ->
+//            val statement = db.prepare(query)//.use { statement ->
 //            val hasStep = statement.step()
 //            if (hasStep) {
 //                try {
@@ -84,15 +94,33 @@ class DBDataManager(
 //            } else {
 //                throw Exception("Statement.step() => $hasStep")
 //            }
-//            GlobalScope.launch {
-            var count = 1
-            while (statement.step()) {
-                content += "File ($count): ${statement.getText(1)}\n"
-                count++
-            }
-        }
 //        }
-        return content
+//        if (statement.step()) {
+//            val countRow = statement.getLong(0)
+//            Log.d("[SQL QUERIES]", query)
+//            Log.i("[Database Row Count]", "$countRow")
+//        }
+//            val res = async {
+            db.prepare(query).use { statement ->
+                var count = 1
+                while (statement.step()) {
+//                        val countRow = statement.getLong(0)
+//                        Log.i("[Database Row Count]", "$countRow")
+//            content.add("File ($count): ${statement.getText(1)}\n")
+                    val added = content.add("File ($count): ${statement.getText(0)}")
+                    Log.i(this::class.simpleName, "Added ($count)($added): ${statement.getText(0)}")
+                    count++
+                }
+                statement.close()
+            }
+//            }
+//            res.await()
+            return@withContext content
+        }
+//        return content
+
+//        return content
+
     }
 
     fun formatRegex(commandSplit: List<String>): String {
