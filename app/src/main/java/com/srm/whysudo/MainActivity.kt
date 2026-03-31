@@ -85,26 +85,51 @@ class MainActivity : AppCompatActivity() {
     private fun changeRealTimeText(text: CharSequence?) {
         mainScope.launch {
             val command: String = (text ?: "").trim().toString()
-            var msg: String
+            var fileNames: List<String>? = null
             if (!command.isEmpty()) {
-                val content = getCommandData(command)
-                msg = content.toString()
-            } else {
-                msg = getString(R.string.hint_main_info_command)
+                fileNames = getCommandData(command)
             }
-            markman.setMark(msg, commandInfoText)
+            showCommandOrList(fileNames)
         }
     }
 
     private suspend fun getCommandData(command: String): List<String> {
         var data: List<String>
         try {
-            data = dbDataManager.dbGetCommandContent(command)
+            data = dbDataManager.getFileNames(command)
             Log.i(tag, data.toString())
         } catch (error: Exception) {
             data = listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
         }
         return data
+    }
+
+    private suspend fun showCommandOrList(filenames: List<String>?): Unit {
+        if (filenames == null) {
+            showDefaultCommandHint()
+            return
+        }
+
+        filenames.size.let {
+            when (it) {
+                1 -> showCommandContent(filenames[0])
+                in 1..20 -> showCommandList(filenames)
+                else -> showDefaultCommandHint()
+            }
+        }
+    }
+
+    private suspend fun showCommandContent(name: String): Unit {
+        val content = dbDataManager.getCommandContent(name)
+        markman.setMark(content, commandInfoText)
+    }
+
+    private fun showCommandList(list: List<String>): Unit {
+        Log.i(tag, "Showing Commands list $list")
+    }
+
+    private fun showDefaultCommandHint(): Unit {
+        markman.setMark(getString(R.string.hint_main_info_command), commandInfoText)
     }
 
     @Suppress("Unused")
