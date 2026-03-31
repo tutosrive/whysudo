@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 
-class DataManager(private val ctx: Context, val fileDataName: String) {
+class RawDataManager(private val ctx: Context, val fileDataName: String) {
     private lateinit var stringData: String
     private lateinit var data: JSONObject
 

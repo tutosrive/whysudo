@@ -17,6 +17,7 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -25,18 +26,22 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.textfield.TextInputEditText
-import com.srm.whysudo.utils.DataManager
+import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.MarkwonManager
 import com.srm.whysudo.utils.Utils
-import org.json.JSONException
-import org.json.JSONObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
     private lateinit var commandInfoText: TextView
     private lateinit var markman: MarkwonManager
-    private lateinit var dataman: DataManager
+    private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
+    private val tag: String? = this::class.simpleName
+    val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,18 +52,23 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        markman = MarkwonManager(this)
-        dataman = DataManager(this, "whysudo.srm")
 
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
         footerTxt = findViewById<TextView>(R.id.footerText)
-
+        markman = MarkwonManager(this)
         loadFooterDate()
-        addListenerEvent()
+
+        dbDataManager = DBDataManager(this, { loadingStatus() }, { addListenerEvent() })
+    }
+
+    fun loadingStatus(): Unit {
+        commandInfoText.text = getString(R.string.loading_msg)
+        inputCommandSearch.isEnabled = false
+        inputCommandSearch.hint = "Loading Database..."
     }
 
     private fun loadFooterDate() {
@@ -67,30 +77,36 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addListenerEvent(): Unit {
-        inputCommandSearch.doOnTextChanged { text, start, before, count ->
-            changeRealTimeText(
-                text,
-                start,
-                before,
-                count
-            )
-        }
+        commandInfoText.text = getString(R.string.hint_main_info_command)
+        inputCommandSearch.isEnabled = true
+
+        inputCommandSearch.hint = getString(R.string.input_search_main_hint)
+        inputCommandSearch.doOnTextChanged { text, _, _, _ -> changeRealTimeText(text) }
     }
 
-    private fun changeRealTimeText(text: CharSequence?, start: Int, before: Int, count: Int) {
+    private fun changeRealTimeText(text: CharSequence?) {
         val command: String = (text ?: "").trim().toString()
 
-        if (!command.isEmpty()) {
-            var commandContent: String
+        mainScope.launch {
+            if (!command.isEmpty()) {
+                var commandContent: List<String> = mutableListOf()
+                var commandTask: List<String>?
+                try {
+                    commandTask = dbDataManager.dbGetCommandContent(command)
+                    commandContent = commandTask
 
-            try {
-                val fileObj: JSONObject = dataman.getJsonByKey(command)
-                commandContent = dataman.getContentString(fileObj)
-                inputCommandSearch.clearFocus()
-            } catch (error: JSONException) {
-                commandContent = getString(R.string.hint_main_info_command)
+                    Log.i(tag, commandContent.toString())
+                } catch (error: Exception) {
+                    commandContent =
+                        listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
+                }
+
+                try {
+                    markman.setMark(commandContent.toString(), commandInfoText)
+                } catch (error: Exception) {
+                    markman.setMark("${error.message}", commandInfoText)
+                }
             }
-            markman.setMark(commandContent, commandInfoText)
         }
     }
 
@@ -98,5 +114,10 @@ class MainActivity : AppCompatActivity() {
     fun goAbout(view: View): Unit {
         val intent = Intent(this, About::class.java)
         startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainScope.cancel()
     }
 }

@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-val versionApp = "0.2.2"
+val versionApp = "0.2.3"
 
 base {
     archivesName.set("WhySudo-v$versionApp")
@@ -40,14 +40,43 @@ android {
         versionCode = 1
     }
 
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+            isUniversalApk = false
+        }
+    }
+
+    bundle {
+        language {
+            @Suppress("unstable")
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        abi {
+            enableSplit = true
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             applicationIdSuffix = ".r"
+
+            packaging {
+                jniLibs {
+                    useLegacyPackaging = false
+                }
+            }
         }
         getByName("debug") {
             applicationIdSuffix = ".d"
@@ -71,4 +100,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation("io.noties.markwon:core:4.6.2")
+    // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite-bundled
+    implementation("androidx.sqlite:sqlite-bundled:2.6.2")
 }
