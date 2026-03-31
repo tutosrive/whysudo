@@ -66,9 +66,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadingStatus(): Unit {
-        commandInfoText.text = getString(R.string.loading_msg)
         inputCommandSearch.isEnabled = false
-        inputCommandSearch.hint = "Loading Database..."
     }
 
     private fun loadFooterDate() {
@@ -86,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun changeRealTimeText(text: CharSequence?) {
         val command: String = (text ?: "").trim().toString()
-
+        var msg: String
         mainScope.launch {
             if (!command.isEmpty()) {
                 var commandContent: List<String> = mutableListOf()
@@ -100,13 +98,15 @@ class MainActivity : AppCompatActivity() {
                     commandContent =
                         listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
                 }
-
                 try {
-                    markman.setMark(commandContent.toString(), commandInfoText)
+                    msg = commandContent.toString()
                 } catch (error: Exception) {
-                    markman.setMark("${error.message}", commandInfoText)
+                    msg = "${error.message}"
                 }
+            } else {
+                msg = getString(R.string.hint_main_info_command)
             }
+            markman.setMark(msg, commandInfoText)
         }
     }
 

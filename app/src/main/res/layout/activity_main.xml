@@ -124,6 +124,7 @@
                     android:singleLine="false"
                     android:textColor="@color/text_color_on_dark"
                     android:textColorHint="@color/text_color_on_dark" />
+
             </LinearLayout>
 
         </LinearLayout>
