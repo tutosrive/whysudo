@@ -25,20 +25,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.MarkwonManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
@@ -93,27 +87,16 @@ class MainActivity : AppCompatActivity() {
     private fun changeRealTimeText(text: CharSequence?) {
         val command: String = (text ?: "").trim().toString()
 
-//        lifecycleScope.launch {
-//        mainScope.launch {
-
         mainScope.launch {
             if (!command.isEmpty()) {
                 var commandContent: List<String> = mutableListOf()
-//                var commandContent: String = ""
                 var commandTask: List<String>?
-//                var commandTask: Flow<String>?
                 try {
-//                    commandTask = async { dbDataManager.dbGetCommandContent(command) }
                     commandTask = dbDataManager.dbGetCommandContent(command)
-
                     commandContent = commandTask
 
-
                     Log.i(tag, commandContent.toString())
-
-//                    Log.i(tag, commandContent.joinToString { "\n" })
                 } catch (error: Exception) {
-//                    commandContent = mutableListOf(getString(R.string.hint_main_info_command))
                     commandContent =
                         listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
                 }
@@ -123,10 +106,8 @@ class MainActivity : AppCompatActivity() {
                 } catch (error: Exception) {
                     markman.setMark("${error.message}", commandInfoText)
                 }
-//                markman.setMark(commandContent, commandInfoText)
             }
         }
-//        }
     }
 
     @Suppress("Unused")
