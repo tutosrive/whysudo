@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
+    private lateinit var ctnInfoText: View
     private lateinit var commandInfoText: TextView
     private lateinit var markman: MarkwonManager
     private lateinit var dbDataManager: DBDataManager
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-
+        ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
         footerTxt = findViewById<TextView>(R.id.footerText)
@@ -120,12 +121,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun showCommandContent(name: String): Unit {
+        setViewVisibility(ctnInfoText, View.VISIBLE)
         val content = dbDataManager.getCommandContent(name)
         markman.setMark(content, commandInfoText)
     }
 
     private fun showCommandList(list: List<String>): Unit {
+        setViewVisibility(ctnInfoText, View.INVISIBLE)
         Log.i(tag, "Showing Commands list $list")
+    }
+
+    private fun setViewVisibility(view: View, value: Int): Unit {
+        val viewVisibility = view.visibility
+
+        if (viewVisibility != value) {
+            view.visibility = value
+        }
     }
 
     private fun showDefaultCommandHint(): Unit {
