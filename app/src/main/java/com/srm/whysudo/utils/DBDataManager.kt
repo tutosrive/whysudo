@@ -57,20 +57,17 @@ class DBDataManager(
     suspend fun dbGetCommandContent(command: String): List<String> {
         return withContext(Dispatchers.IO) {
             val content: MutableList<String> = mutableListOf<String>()
-            val commandSplitted: List<String> = command.split("\\s+".toRegex())
+            val cmdSplit: List<String> = command.split("\\s+".toRegex())
+            val cmd = cmdSplit.joinToString(separator = "-")
             val query =
-                """SELECT filename, content FROM file WHERE filename = '$command'
+                """SELECT filename, content FROM file WHERE filename = '$cmd'
                     OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
-                    formatRegex(commandSplitted)
-                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$command')
+                    formatRegex(cmdSplit)
+                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
                 LIMIT 20"""
-
             db.prepare(query).use { statement ->
-                var count = 1
                 while (statement.step()) {
-                    val added = content.add("File ($count): ${statement.getText(0)}")
-                    Log.i(this::class.simpleName, "Added ($count)($added): ${statement.getText(0)}")
-                    count++
+                    content.add(statement.getText(0))
                 }
                 statement.close()
             }

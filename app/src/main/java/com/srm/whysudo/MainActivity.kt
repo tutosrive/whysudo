@@ -5,10 +5,10 @@
  * GitHub: https://github.com/tutosrive
  *
  * This source code is PROPRIETARY and CONFIDENTIAL.
- * Unauthorized copying, modification, or distribution of this file,
- * via any medium, is strictly prohibited.
+ * Unauthorized copying, modification, or distribution of this file, 
+ * via any medium, is strictly prohibited. 
  *
- * This software is provided "as is", without warranty of any kind.
+ * This software is provided "as is", without warranty of any kind. 
  * In no event shall the author be liable for any claim or damages.
  */
 
@@ -83,31 +83,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeRealTimeText(text: CharSequence?) {
-        val command: String = (text ?: "").trim().toString()
-        var msg: String
         mainScope.launch {
+            val command: String = (text ?: "").trim().toString()
+            var msg: String
             if (!command.isEmpty()) {
-                var commandContent: List<String> = mutableListOf()
-                var commandTask: List<String>?
-                try {
-                    commandTask = dbDataManager.dbGetCommandContent(command)
-                    commandContent = commandTask
-
-                    Log.i(tag, commandContent.toString())
-                } catch (error: Exception) {
-                    commandContent =
-                        listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
-                }
-                try {
-                    msg = commandContent.toString()
-                } catch (error: Exception) {
-                    msg = "${error.message}"
-                }
+                val content = getCommandData(command)
+                msg = content.toString()
             } else {
                 msg = getString(R.string.hint_main_info_command)
             }
             markman.setMark(msg, commandInfoText)
         }
+    }
+
+    private suspend fun getCommandData(command: String): List<String> {
+        var data: List<String>
+        try {
+            data = dbDataManager.dbGetCommandContent(command)
+            Log.i(tag, data.toString())
+        } catch (error: Exception) {
+            data = listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
+        }
+        return data
     }
 
     @Suppress("Unused")
