@@ -66,19 +66,23 @@ class DBDataManager(
             val content: MutableList<String> = mutableListOf<String>()
 //        var content = ""
             val commandSplitted: List<String> = command.split("\\s+".toRegex())
-            val query = if (commandSplitted.size == 1) {
-                "SELECT filename, content FROM file WHERE filename = '$command'"
-            } else {
-                "SELECT filename, content FROM file WHERE id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
+//            val query = if (commandSplitted.size == 1) {
+//                "SELECT filename, content FROM file WHERE filename = '$command'"
+//            } else {
+//                "SELECT filename, content FROM file WHERE id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
+//                    formatRegex(
+//                        commandSplitted
+//                    )
+//                }')"
+//            }
+            val query =
+                """SELECT filename, content FROM file WHERE filename = '$command'
+                    UNION
+                    SELECT filename, content FROM file WHERE id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
                     formatRegex(
                         commandSplitted
                     )
-                }')"
-            }
-//        val query =
-//            "SELECT COUNT(*), filename, content FROM file WHERE filename = '$command' OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
-//                formatRegex(commandSplitted)
-//            }"
+                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$command')"""
 
 //            val statement = db.prepare(query)//.use { statement ->
 //            val hasStep = statement.step()
