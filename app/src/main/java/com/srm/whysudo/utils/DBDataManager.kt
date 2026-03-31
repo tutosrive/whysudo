@@ -60,11 +60,10 @@ class DBDataManager(
             val commandSplitted: List<String> = command.split("\\s+".toRegex())
             val query =
                 """SELECT filename, content FROM file WHERE filename = '$command'
-                    UNION
-                    SELECT filename, content
-                    FROM file WHERE id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
+                    OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
                     formatRegex(commandSplitted)
-                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$command')"""
+                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$command')
+                LIMIT 20"""
 
             db.prepare(query).use { statement ->
                 var count = 1
