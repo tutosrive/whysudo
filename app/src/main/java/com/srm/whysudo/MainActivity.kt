@@ -120,13 +120,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun getCommandData(command: String): List<String> {
-        var data: List<String>
+    private suspend fun getCommandData(command: String): List<String>? {
+        var data: List<String>? = null
         try {
             data = dbDataManager.getFileNames(command)
             Log.i(tag, data.toString())
         } catch (error: Exception) {
-            data = listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
+            showDefaultCommandHint()
         }
         return data
     }
@@ -155,13 +155,13 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun showCommandList(list: List<String>): Unit {
         commandsListElements = list
-        Log.i(tag, "Showing Commands list $list")
         setViewVisibility(ctnInfoText, View.INVISIBLE)
         setViewVisibility(listCommands, View.VISIBLE)
 
         val elements: ArrayAdapter<String> = ArrayAdapter(
             this,
-            android.R.layout.simple_list_item_1, list
+            android.R.layout.simple_list_item_1,
+            list
         )
 
         listCommands.adapter = elements
