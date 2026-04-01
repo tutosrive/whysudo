@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun showCommandList(list: List<String>): Unit {
         commandsListElements = list
-        setViewVisibility(ctnInfoText, View.INVISIBLE)
+        setViewVisibility(ctnInfoText, View.GONE)
         setViewVisibility(listCommands, View.VISIBLE)
 
         val elements: ArrayAdapter<String> = ArrayAdapter(

@@ -36,20 +36,6 @@
             android:translationY="10sp"
             app:srcCompat="@mipmap/ic_launcher" />
 
-        <ListView
-            android:id="@+id/listCommands"
-            android:layout_width="320dp"
-            android:layout_height="350dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/rounded_background"
-            android:backgroundTint="@color/background_dark_glass"
-            android:paddingLeft="15dp"
-            android:paddingTop="10dp"
-            android:paddingRight="15dp"
-            android:paddingBottom="10dp"
-            android:translationY="165sp"
-            android:visibility="invisible" />
-
         <ImageButton
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -152,6 +138,19 @@
                     android:textColorHint="@color/text_color_on_dark" />
 
             </LinearLayout>
+
+            <ListView
+                android:id="@+id/listCommands"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/rounded_background"
+                android:backgroundTint="@color/background_dark_glass"
+                android:paddingLeft="15dp"
+                android:paddingTop="10dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="10dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
