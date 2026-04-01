@@ -1,8 +1,21 @@
+<!--
+  ~ Copyright (c) 2026 tutosrive. All rights reserved.
+  ~
+  ~ Author: tutosrive
+  ~ GitHub: https://github.com/tutosrive
+  ~
+  ~ This source code is PROPRIETARY and CONFIDENTIAL.
+  ~ Unauthorized copying, modification, or distribution of this file,
+  ~ via any medium, is strictly prohibited.
+  ~
+  ~ This software is provided "as is", without warranty of any kind.
+  ~ In no event shall the author be liable for any claim or damages.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Testxml" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="Theme.Testxml" parent="Base.Theme.Testxml" />

@@ -15,7 +15,6 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.sqlite.SQLiteConnection
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
@@ -52,26 +51,36 @@ class DBDataManager(
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     @Throws(Exception::class)
-    suspend fun dbGetCommandContent(command: String): List<String> {
+    suspend fun getFileNames(command: String): List<String> {
         return withContext(Dispatchers.IO) {
-            val content: MutableList<String> = mutableListOf<String>()
-            val commandSplitted: List<String> = command.split("\\s+".toRegex())
+            val fileNames: MutableList<String> = mutableListOf<String>()
+            val cmdSplit: List<String> = command.split("\\s+".toRegex())
+            val cmd = cmdSplit.joinToString(separator = "-")
             val query =
-                """SELECT filename, content FROM file WHERE filename = '$command'
+                """SELECT filename FROM file WHERE filename = '$cmd'
                     OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
-                    formatRegex(commandSplitted)
-                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$command')
+                    formatRegex(cmdSplit)
+                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
                 LIMIT 20"""
-
             db.prepare(query).use { statement ->
-                var count = 1
                 while (statement.step()) {
-                    val added = content.add("File ($count): ${statement.getText(0)}")
-                    Log.i(this::class.simpleName, "Added ($count)($added): ${statement.getText(0)}")
-                    count++
+                    fileNames.add(statement.getText(0))
                 }
+                statement.close()
+            }
+            return@withContext fileNames
+        }
+    }
+
+    @Throws(Exception::class)
+    suspend fun getCommandContent(command: String): String {
+        return withContext(Dispatchers.IO) {
+            var content: String
+            val query = "SELECT content FROM file WHERE filename = '$command'"
+            db.prepare(query).use { statement ->
+                statement.step()
+                content = statement.getText(0)
                 statement.close()
             }
             return@withContext content

@@ -15,7 +15,6 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import android.util.Log
 import android.widget.TextView
 import java.io.File
 import java.io.FileOutputStream
@@ -59,7 +58,6 @@ object Utils {
 
             if (!outputFile.exists()) {
                 val file = loadAssetFile(ctx, filename)
-//                outputFile.parentFile?.mkdirs()
 
                 file.use { inputStream ->
                     FileOutputStream(outputFile).use { outputStream ->
@@ -67,9 +65,7 @@ object Utils {
                     }
                 }
             }
-            Log.i("[Log Database exists]", "${outputFile.exists()}: ${outputFile.absolutePath}")
         } catch (e: Exception) {
-            Log.e("[ERROR loading asset]", "${e.message}")
         }
     }
 }

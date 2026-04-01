@@ -5,10 +5,10 @@
  * GitHub: https://github.com/tutosrive
  *
  * This source code is PROPRIETARY and CONFIDENTIAL.
- * Unauthorized copying, modification, or distribution of this file,
- * via any medium, is strictly prohibited.
+ * Unauthorized copying, modification, or distribution of this file, 
+ * via any medium, is strictly prohibited. 
  *
- * This software is provided "as is", without warranty of any kind.
+ * This software is provided "as is", without warranty of any kind. 
  * In no event shall the author be liable for any claim or damages.
  */
 
@@ -17,8 +17,10 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -36,10 +38,13 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
+    private lateinit var ctnInfoText: View
     private lateinit var commandInfoText: TextView
     private lateinit var markman: MarkwonManager
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
+    private lateinit var listCommands: ListView
+    private lateinit var commandsListElements: List<String>
     private val tag: String? = this::class.simpleName
     val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -55,20 +60,33 @@ class MainActivity : AppCompatActivity() {
         @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-
+        ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
         footerTxt = findViewById<TextView>(R.id.footerText)
+        listCommands = findViewById<ListView>(R.id.listCommands)
         markman = MarkwonManager(this)
         loadFooterDate()
 
-        dbDataManager = DBDataManager(this, { loadingStatus() }, { addListenerEvent() })
+        dbDataManager = DBDataManager(
+            ctx = this,
+            callbackOnStartLoad = { loadingStatus() },
+            callbackOnFinishLoad = { addListenerEvent() }
+        )
+        listCommands.onItemClickListener = handleListItemClick()
+    }
+
+    private fun handleListItemClick(): AdapterView.OnItemClickListener {
+        return AdapterView.OnItemClickListener { _, _, pos, _ ->
+            mainScope.launch {
+                val commandSelected = commandsListElements[pos]
+                showCommandContent(commandSelected)
+            }
+        }
     }
 
     fun loadingStatus(): Unit {
-        commandInfoText.text = getString(R.string.loading_msg)
         inputCommandSearch.isEnabled = false
-        inputCommandSearch.hint = "Loading Database..."
     }
 
     private fun loadFooterDate() {
@@ -81,33 +99,84 @@ class MainActivity : AppCompatActivity() {
         inputCommandSearch.isEnabled = true
 
         inputCommandSearch.hint = getString(R.string.input_search_main_hint)
-        inputCommandSearch.doOnTextChanged { text, _, _, _ -> changeRealTimeText(text) }
+        inputCommandSearch.doOnTextChanged { text, _, before, count ->
+            changeRealTimeText(text, before, count)
+        }
     }
 
-    private fun changeRealTimeText(text: CharSequence?) {
+    private fun changeRealTimeText(text: CharSequence?, before: Int, count: Int) {
+        var fileNames: List<String>? = null
         val command: String = (text ?: "").trim().toString()
-
-        mainScope.launch {
-            if (!command.isEmpty()) {
-                var commandContent: List<String> = mutableListOf()
-                var commandTask: List<String>?
-                try {
-                    commandTask = dbDataManager.dbGetCommandContent(command)
-                    commandContent = commandTask
-
-                    Log.i(tag, commandContent.toString())
-                } catch (error: Exception) {
-                    commandContent =
-                        listOf("${getString(R.string.hint_main_info_command)} -> ${error.message}")
+        when {
+            !command.isEmpty() -> mainScope.launch {
+                if (!command.isEmpty()) {
+                    fileNames = getCommandData(command)
                 }
+                showCommandOrList(fileNames)
+            }
 
-                try {
-                    markman.setMark(commandContent.toString(), commandInfoText)
-                } catch (error: Exception) {
-                    markman.setMark("${error.message}", commandInfoText)
-                }
+            else -> showDefaultCommandHint()
+        }
+    }
+
+    private suspend fun getCommandData(command: String): List<String>? {
+        var data: List<String>? = null
+        try {
+            data = dbDataManager.getFileNames(command)
+        } catch (error: Exception) {
+            showDefaultCommandHint()
+        }
+        return data
+    }
+
+    private suspend fun showCommandOrList(filenames: List<String>?): Unit {
+        if (filenames == null) {
+            showDefaultCommandHint()
+            return
+        }
+
+        filenames.size.let {
+            when (it) {
+                1 -> showCommandContent(filenames[0])
+                in 2..20 -> showCommandList(filenames)
+                else -> showDefaultCommandHint()
             }
         }
+    }
+
+    private suspend fun showCommandContent(name: String): Unit {
+        setViewVisibility(listCommands, View.INVISIBLE)
+        setViewVisibility(ctnInfoText, View.VISIBLE)
+        val content = dbDataManager.getCommandContent(name)
+        markman.setMark(content, commandInfoText)
+    }
+
+    private suspend fun showCommandList(list: List<String>): Unit {
+        commandsListElements = list
+        setViewVisibility(ctnInfoText, View.INVISIBLE)
+        setViewVisibility(listCommands, View.VISIBLE)
+
+        val elements: ArrayAdapter<String> = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            list
+        )
+
+        listCommands.adapter = elements
+    }
+
+    private fun setViewVisibility(view: View, value: Int): Unit {
+        val viewVisibility = view.visibility
+
+        if (viewVisibility != value) {
+            view.visibility = value
+        }
+    }
+
+    private fun showDefaultCommandHint(): Unit {
+        setViewVisibility(ctnInfoText, View.VISIBLE)
+        setViewVisibility(listCommands, View.INVISIBLE)
+        markman.setMark(getString(R.string.hint_main_info_command), commandInfoText)
     }
 
     @Suppress("Unused")
