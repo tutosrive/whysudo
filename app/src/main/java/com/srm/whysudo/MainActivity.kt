@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addListenerEvent(): Unit {
-        commandInfoText.text = getString(R.string.hint_main_info_command)
+        showDefaultCommandHint()
         inputCommandSearch.isEnabled = true
 
         inputCommandSearch.hint = getString(R.string.input_search_main_hint)
