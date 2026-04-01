@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addListenerEvent(): Unit {
-        commandInfoText.text = getString(R.string.hint_main_info_command)
+        showDefaultCommandHint()
         inputCommandSearch.isEnabled = true
 
         inputCommandSearch.hint = getString(R.string.input_search_main_hint)
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
         filenames.size.let {
             when (it) {
                 1 -> showCommandContent(filenames[0])
-                in 2..20 -> showCommandList(filenames)
+                in 2..it -> showCommandList(filenames)
                 else -> showDefaultCommandHint()
             }
         }
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun showCommandList(list: List<String>): Unit {
         commandsListElements = list
-        setViewVisibility(ctnInfoText, View.INVISIBLE)
+        setViewVisibility(ctnInfoText, View.GONE)
         setViewVisibility(listCommands, View.VISIBLE)
 
         val elements: ArrayAdapter<String> = ArrayAdapter(
