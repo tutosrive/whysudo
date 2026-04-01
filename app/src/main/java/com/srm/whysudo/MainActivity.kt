@@ -17,6 +17,7 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -138,7 +139,7 @@ class MainActivity : AppCompatActivity() {
         filenames.size.let {
             when (it) {
                 1 -> showCommandContent(filenames[0])
-                in 2..20 -> showCommandList(filenames)
+                in 2..it -> showCommandList(filenames)
                 else -> showDefaultCommandHint()
             }
         }

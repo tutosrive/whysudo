@@ -63,15 +63,37 @@ class DBDataManager(
                     OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
                     formatRegex(cmdSplit)
                 }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
-                LIMIT 20"""
+                LIMIT 40"""
             db.prepare(query).use { statement ->
                 while (statement.step()) {
                     fileNames.add(statement.getText(0))
                 }
                 statement.close()
             }
-            Log.i(this::class.simpleName, fileNames.toString())
+            sortData(fileNames, command)
             return@withContext fileNames
+        }
+    }
+
+    suspend fun sortData(data: MutableList<String>, command: String) {
+        withContext(Dispatchers.IO) {
+            val query = command.lowercase().trim()
+            if (query.isEmpty()) data.sorted()
+
+            data.sortWith(
+                compareByDescending<String> { item ->
+                    val cmd = item.lowercase()
+                    when {
+                        cmd == query -> 1000
+                        cmd.startsWith(query) -> 500
+                        cmd.startsWith("$query-") -> 400
+                        cmd.contains(query) -> 100
+
+                        else -> 0
+                    }
+                }.thenBy { it.length }
+                    .thenBy { it }
+            )
         }
     }
 
