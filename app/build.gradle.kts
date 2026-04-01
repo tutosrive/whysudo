@@ -49,23 +49,11 @@ android {
         }
     }
 
-    bundle {
-        language {
-            @Suppress("unstable")
-            enableSplit = true
-        }
-        density {
-            enableSplit = true
-        }
-        abi {
-            enableSplit = true
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
-            isShrinkResources = true
+            isShrinkResources = true // Just when is release
+            // isShrinkResources = false // Just in AAB Release
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
