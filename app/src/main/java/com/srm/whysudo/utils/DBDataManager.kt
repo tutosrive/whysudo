@@ -15,7 +15,6 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.sqlite.SQLiteConnection
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
