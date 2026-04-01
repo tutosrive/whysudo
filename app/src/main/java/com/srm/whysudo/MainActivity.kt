@@ -109,14 +109,14 @@ class MainActivity : AppCompatActivity() {
         var fileNames: List<String>? = null
         val command: String = (text ?: "").trim().toString()
         when {
-            before < count -> mainScope.launch {
+            !command.isEmpty() -> mainScope.launch {
                 if (!command.isEmpty()) {
                     fileNames = getCommandData(command)
                 }
                 showCommandOrList(fileNames)
             }
 
-            command.isEmpty() -> showDefaultCommandHint()
+            else -> showDefaultCommandHint()
         }
     }
 
@@ -124,7 +124,6 @@ class MainActivity : AppCompatActivity() {
         var data: List<String>? = null
         try {
             data = dbDataManager.getFileNames(command)
-            Log.i(tag, data.toString())
         } catch (error: Exception) {
             showDefaultCommandHint()
         }

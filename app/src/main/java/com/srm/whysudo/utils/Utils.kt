@@ -67,9 +67,8 @@ object Utils {
                     }
                 }
             }
-            Log.i("[Log Database exists]", "${outputFile.exists()}: ${outputFile.absolutePath}")
         } catch (e: Exception) {
-            Log.e("[ERROR loading asset]", "${e.message}")
+
         }
     }
 }
