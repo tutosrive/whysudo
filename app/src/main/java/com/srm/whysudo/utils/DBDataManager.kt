@@ -16,9 +16,7 @@ package com.srm.whysudo.utils
 
 import android.content.Context
 import android.widget.Toast
-import androidx.sqlite.SQLiteConnection
 import com.srm.whysudo.database_man.DbManager
-import com.srm.whysudo.enums.DataFileName
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,10 +29,8 @@ class DBDataManager(
     val callbackOnStartLoad: () -> Unit,
     val callbackOnFinishLoad: () -> Unit
 ) {
-    val fileDataName: String = "data-linux.enc.db" // DataFileName.DB_COMMANDS() "data-linux.enc.db"
+    val fileDataName: String = "data-linux.enc.db"
     private lateinit var dbMan: DbManager
-
-    //    private lateinit var db: SQLiteConnection
     private lateinit var db: SQLiteDatabase
 
     init {
@@ -71,12 +67,6 @@ class DBDataManager(
                     formatRegex(cmdSplit)
                 }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
                 LIMIT 40"""
-//            db.prepare(query).use { statement ->
-//                while (statement.step()) {
-//                    fileNames.add(statement.getText(0))
-//                }
-//                statement.close()
-//            }
             db.rawQuery(query).use {
                 while (it.moveToNext()) {
                     fileNames.add(it.getString(0))
@@ -115,11 +105,6 @@ class DBDataManager(
         return withContext(Dispatchers.IO) {
             var content: String
             val query = "SELECT content FROM file WHERE filename = '$command'"
-//            db.prepare(query).use { statement ->
-//                statement.step()
-//                content = statement.getText(0)
-//                statement.close()
-//            }
             db.rawQuery(query).use {
                 it.moveToFirst()
                 content = it.getString(0)

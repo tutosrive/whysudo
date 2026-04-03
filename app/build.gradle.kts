@@ -89,7 +89,9 @@ dependencies {
 
     implementation("io.noties.markwon:core:4.6.2")
     // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite-bundled
-    implementation("androidx.sqlite:sqlite-bundled:2.6.2")
+//    implementation("androidx.sqlite:sqlite-bundled:2.6.2")
+    // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite
+    implementation("androidx.sqlite:sqlite:2.6.2")
     implementation("net.zetetic:sqlcipher-android:4.14.0@aar")
 
 
