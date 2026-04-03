@@ -15,6 +15,7 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
+import android.widget.Toast
 import androidx.sqlite.SQLiteConnection
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
@@ -23,15 +24,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.zetetic.database.sqlcipher.SQLiteDatabase
 
 class DBDataManager(
     private val ctx: Context,
     val callbackOnStartLoad: () -> Unit,
     val callbackOnFinishLoad: () -> Unit
 ) {
-    val fileDataName: String = DataFileName.DB_COMMANDS()
+    val fileDataName: String = "data-linux.enc.db" // DataFileName.DB_COMMANDS() "data-linux.enc.db"
     private lateinit var dbMan: DbManager
-    private lateinit var db: SQLiteConnection
+
+    //    private lateinit var db: SQLiteConnection
+    private lateinit var db: SQLiteDatabase
 
     init {
         loadData()
@@ -39,15 +43,19 @@ class DBDataManager(
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun loadData() {
-        val job = GlobalScope.launch {
-            callbackOnStartLoad()
-            Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
-        }
+        try {
+            val job = GlobalScope.launch {
+                callbackOnStartLoad()
+                Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
+            }
 
-        job.invokeOnCompletion {
-            dbMan = DbManager(fileDataName, ctx)
-            db = dbMan.conn
-            callbackOnFinishLoad()
+            job.invokeOnCompletion {
+                dbMan = DbManager(fileDataName, ctx)
+                db = dbMan.conn
+                callbackOnFinishLoad()
+            }
+        } catch (error: Exception) {
+            Toast.makeText(ctx, "Error LoadData => ${error.message}", Toast.LENGTH_LONG * 3).show()
         }
     }
 
@@ -63,11 +71,17 @@ class DBDataManager(
                     formatRegex(cmdSplit)
                 }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
                 LIMIT 40"""
-            db.prepare(query).use { statement ->
-                while (statement.step()) {
-                    fileNames.add(statement.getText(0))
+//            db.prepare(query).use { statement ->
+//                while (statement.step()) {
+//                    fileNames.add(statement.getText(0))
+//                }
+//                statement.close()
+//            }
+            db.rawQuery(query).use {
+                while (it.moveToNext()) {
+                    fileNames.add(it.getString(0))
                 }
-                statement.close()
+                it.close()
             }
             sortData(fileNames, command)
             return@withContext fileNames
@@ -101,10 +115,15 @@ class DBDataManager(
         return withContext(Dispatchers.IO) {
             var content: String
             val query = "SELECT content FROM file WHERE filename = '$command'"
-            db.prepare(query).use { statement ->
-                statement.step()
-                content = statement.getText(0)
-                statement.close()
+//            db.prepare(query).use { statement ->
+//                statement.step()
+//                content = statement.getText(0)
+//                statement.close()
+//            }
+            db.rawQuery(query).use {
+                it.moveToFirst()
+                content = it.getString(0)
+                it.close()
             }
             return@withContext content
         }

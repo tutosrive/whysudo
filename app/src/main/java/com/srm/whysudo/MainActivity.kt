@@ -22,6 +22,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -35,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
@@ -59,7 +61,6 @@ class MainActivity : AppCompatActivity() {
         }
         @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
         ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         markman = MarkwonManager(this)
         loadFooterDate()
 
+        System.loadLibrary("sqlcipher")
         dbDataManager = DBDataManager(
             ctx = this,
             callbackOnStartLoad = { loadingStatus() },
@@ -86,7 +88,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadingStatus(): Unit {
-        inputCommandSearch.isEnabled = false
+        mainScope.launch { inputCommandSearch.isEnabled = false }
     }
 
     private fun loadFooterDate() {
@@ -95,12 +97,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addListenerEvent(): Unit {
-        showDefaultCommandHint()
-        inputCommandSearch.isEnabled = true
+        mainScope.launch {
+            showDefaultCommandHint()
+            inputCommandSearch.isEnabled = true
 
-        inputCommandSearch.hint = getString(R.string.input_search_main_hint)
-        inputCommandSearch.doOnTextChanged { text, _, before, count ->
-            changeRealTimeText(text, before, count)
+            inputCommandSearch.hint = getString(R.string.input_search_main_hint)
+            inputCommandSearch.doOnTextChanged { text, _, before, count ->
+                changeRealTimeText(text, before, count)
+            }
         }
     }
 
