@@ -67,7 +67,6 @@ class MainActivity : AppCompatActivity() {
         markman = MarkwonManager(this)
         loadFooterDate()
 
-        System.loadLibrary("sqlcipher")
         dbDataManager = DBDataManager(
             ctx = this,
             callbackOnStartLoad = { loadingStatus() },
@@ -86,7 +85,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadingStatus(): Unit {
-        mainScope.launch { inputCommandSearch.isEnabled = false }
+        mainScope.launch {
+            inputCommandSearch.isEnabled = false
+            setViewVisibility(ctnInfoText, View.VISIBLE)
+            commandInfoText.text = getString(R.string.loading_msg)
+        }
     }
 
     private fun loadFooterDate() {
@@ -189,6 +192,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        dbDataManager.close()
         mainScope.cancel()
     }
 }

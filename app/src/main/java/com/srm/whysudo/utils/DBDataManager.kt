@@ -17,9 +17,10 @@ package com.srm.whysudo.utils
 import android.content.Context
 import android.widget.Toast
 import com.srm.whysudo.database_man.DbManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+//import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.zetetic.database.sqlcipher.SQLiteDatabase
@@ -29,7 +30,7 @@ class DBDataManager(
     val callbackOnStartLoad: () -> Unit,
     val callbackOnFinishLoad: () -> Unit
 ) {
-    val fileDataName: String = "data-linux.enc.db"
+    val fileDataName: String = "data-linux.enc.srm" //"data-linux.enc.db"
     private lateinit var dbMan: DbManager
     private lateinit var db: SQLiteDatabase
 
@@ -40,13 +41,14 @@ class DBDataManager(
     @OptIn(DelicateCoroutinesApi::class)
     private fun loadData() {
         try {
-            val job = GlobalScope.launch {
+            val job = CoroutineScope(Dispatchers.IO).launch {
                 callbackOnStartLoad()
                 Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
+                dbMan = DbManager(fileDataName, ctx)
             }
+//            val job = GlobalScope.launch {}
 
             job.invokeOnCompletion {
-                dbMan = DbManager(fileDataName, ctx)
                 db = dbMan.conn
                 callbackOnFinishLoad()
             }
@@ -118,5 +120,9 @@ class DBDataManager(
         var reg = ""
         for (word in commandSplit) reg += "$word* "
         return reg.trimEnd()
+    }
+
+    fun close() {
+        dbMan.close()
     }
 }
