@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         var data: List<String>? = null
         try {
             data = dbDataManager.getFileNames(command)
-        } catch (error: Exception) {
+        } catch (e: Exception) {
             showDefaultCommandHint()
         }
         return data

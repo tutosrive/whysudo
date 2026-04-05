@@ -15,12 +15,9 @@
 package com.srm.whysudo.database_man
 
 import android.content.Context
-import android.database.Cursor
 import net.zetetic.database.sqlcipher.SQLiteConnection
-import net.zetetic.database.sqlcipher.SQLiteCursorDriver
 import net.zetetic.database.sqlcipher.SQLiteDatabase
 import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
-import net.zetetic.database.sqlcipher.SQLiteQuery
 
 class DbManager(dbName: String, ctx: Context) {
     var conn: SQLiteDatabase
@@ -44,7 +41,6 @@ class DbManager(dbName: String, ctx: Context) {
 
         override fun postKey(p0: SQLiteConnection?) {
             p0?.execute("PRAGMA kdf_iter = 5000;", null, null)
-//            p0?.executeRaw("PRAGMA kdf_iter = 1000;", null, null)
         }
     }
 }
