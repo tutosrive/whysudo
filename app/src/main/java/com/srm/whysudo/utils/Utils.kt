@@ -68,4 +68,8 @@ object Utils {
         } catch (e: Exception) {
         }
     }
+
+    fun scalePixelToRealSize(ctx: Context, pixel: Int): Int {
+        return (pixel * ctx.resources.displayMetrics.density).toInt()
+    }
 }
