@@ -14,6 +14,8 @@
 
 package com.srm.whysudo.utils
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.widget.TextView
 import java.io.File
@@ -71,5 +73,11 @@ object Utils {
 
     fun scalePixelToRealSize(ctx: Context, pixel: Int): Int {
         return (pixel * ctx.resources.displayMetrics.density).toInt()
+    }
+
+    fun copyToClipboard(ctx: Context, msg: String, content: String): Unit {
+        val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val data = ClipData.newPlainText(msg, content)
+        clipboard.setPrimaryClip(data)
     }
 }

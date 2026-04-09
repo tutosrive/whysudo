@@ -28,4 +28,5 @@
     <string name="loading_msg">Loading...</string>
     <string name="try_reload_msg">Sorry, try reload again...</string>
     <string name="description_logo_image">\"Why Sudo\" Logo</string>
+    <string name="copy_clipboard_successfully">Command Copied</string>
 </resources>
