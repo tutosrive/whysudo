@@ -24,7 +24,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.srm.whysudo.enums.DataFileName
-import com.srm.whysudo.utils.MarkwonManager
+import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.RawDataManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 
 class About : AppCompatActivity() {
     private lateinit var infoText: TextView
-    private lateinit var markmanAbout: MarkwonManager
+    private lateinit var markmanAbout: MarkdownManager
     private lateinit var rawDatamanAbout: RawDataManager
     private lateinit var footerText: TextView
     private lateinit var appVersion: String
@@ -50,7 +50,7 @@ class About : AppCompatActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         appVersion = packageManager.getPackageInfo(packageName, 0).versionName.toString()
-        markmanAbout = MarkwonManager(this)
+        markmanAbout = MarkdownManager(this)
         rawDatamanAbout = RawDataManager(this, DataFileName.ABOUT())
 
         infoText = findViewById<TextView>(R.id.infoText)

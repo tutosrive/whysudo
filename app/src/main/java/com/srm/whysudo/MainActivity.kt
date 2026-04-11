@@ -24,13 +24,12 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.utils.DBDataManager
-import com.srm.whysudo.utils.MarkwonManager
+import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
     private lateinit var ctnInfoText: View
     private lateinit var commandInfoText: TextView
-    private lateinit var markman: MarkwonManager
+    private lateinit var markman: MarkdownManager
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
     private lateinit var listCommands: ListView
@@ -65,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
         footerTxt = findViewById<TextView>(R.id.footerText)
         listCommands = findViewById<ListView>(R.id.listCommands)
-        markman = MarkwonManager(this)
+        markman = MarkdownManager(this)
         loadFooterDate()
 
         dbDataManager = DBDataManager(

@@ -91,6 +91,4 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite
     implementation("androidx.sqlite:sqlite:2.6.2")
     implementation("net.zetetic:sqlcipher-android:4.14.0@aar")
-    // Source: https://mvnrepository.com/artifact/me.saket/better-link-movement-method
-    implementation("me.saket:better-link-movement-method:2.2.0")
 }

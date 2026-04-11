@@ -12,19 +12,26 @@
  * In no event shall the author be liable for any claim or damages.
  */
 
-package com.srm.whysudo.utils
+package com.srm.whysudo.markdown
 
 import android.content.Context
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
+import android.text.method.ScrollingMovementMethod
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import com.srm.whysudo.MainActivity
 import com.srm.whysudo.R
+import com.srm.whysudo.utils.Utils
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonSpansFactory
 import io.noties.markwon.core.MarkwonTheme
+import io.noties.markwon.movement.MovementMethodPlugin
+import org.commonmark.node.FencedCodeBlock
 
-class MarkwonManager(val ctx: Context) {
+class MarkdownManager(val ctx: Context) {
     var mark: Markwon
 
     init {
@@ -48,7 +55,16 @@ class MarkwonManager(val ctx: Context) {
                         }
                     }
                 }
+
+                override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
+                    builder.appendFactory(FencedCodeBlock::class.java) { _, _ ->
+                        val iconCopy: Drawable =
+                            AppCompatResources.getDrawable(ctx, R.drawable.shell_text)!!
+                        CopyIconSpan(iconCopy)
+                    }
+                }
             })
+            .usePlugin(MovementMethodPlugin.create(ScrollingMovementMethod.getInstance()))
     }
 
     private fun codeStyles(b: MarkwonTheme.Builder) {
@@ -56,7 +72,7 @@ class MarkwonManager(val ctx: Context) {
         val codeBlockMargin: Int = Utils.scalePixelToRealSize(ctx, 5)
         val blockTextSize: Int = Utils.scalePixelToRealSize(ctx, 12)
         val bgColor: Int = ctx.getColor(R.color.dark_blue)
-        val textColor: Int = ctx.getColor(R.color.text_color_on_dark)
+        val textColor: Int = ctx.getColor(R.color.code_block_color)
 
         b
             .codeTextColor(textColor)
