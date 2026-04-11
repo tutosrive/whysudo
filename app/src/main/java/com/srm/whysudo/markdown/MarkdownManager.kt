@@ -17,6 +17,7 @@ package com.srm.whysudo.markdown
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.text.Spanned
 import android.text.method.ScrollingMovementMethod
 import android.widget.TextView
 import android.widget.Toast
@@ -73,8 +74,12 @@ class MarkdownManager(val ctx: Context) {
         val blockTextSize: Int = Utils.scalePixelToRealSize(ctx, 12)
         val bgColor: Int = ctx.getColor(R.color.dark_blue)
         val textColor: Int = ctx.getColor(R.color.code_block_color)
+        val typefaceCode: Typeface = Typeface.create(Typeface.MONOSPACE, Typeface.ITALIC)
+        val typefaceCodeBlock: Typeface = Typeface.MONOSPACE
 
         b
+            .codeTypeface(typefaceCode)
+            .codeBlockTypeface(typefaceCodeBlock)
             .codeTextColor(textColor)
             .codeBackgroundColor(bgColor)
             .codeBlockTextColor(textColor)
