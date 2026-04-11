@@ -15,14 +15,14 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import androidx.sqlite.SQLiteConnection
+import android.widget.Toast
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.zetetic.database.sqlcipher.SQLiteDatabase
 
 class DBDataManager(
     private val ctx: Context,
@@ -31,28 +31,32 @@ class DBDataManager(
 ) {
     val fileDataName: String = DataFileName.DB_COMMANDS()
     private lateinit var dbMan: DbManager
-    private lateinit var db: SQLiteConnection
+    private lateinit var db: SQLiteDatabase
 
     init {
         loadData()
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun loadData() {
-        val job = GlobalScope.launch {
-            callbackOnStartLoad()
-            Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
-        }
 
-        job.invokeOnCompletion {
-            dbMan = DbManager(fileDataName, ctx)
-            db = dbMan.conn
-            callbackOnFinishLoad()
+    private fun loadData() {
+        try {
+            val job = CoroutineScope(Dispatchers.IO).launch {
+                callbackOnStartLoad()
+                Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
+                dbMan = DbManager(fileDataName, ctx)
+            }
+
+            job.invokeOnCompletion {
+                db = dbMan.conn
+                callbackOnFinishLoad()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(ctx, "Try Re-Open the aplication", Toast.LENGTH_SHORT).show()
         }
     }
 
     @Throws(Exception::class)
-    suspend fun getFileNames(command: String): List<String> {
+    suspend fun getFileNames(command: String, limit: Int? = 40): List<String> {
         return withContext(Dispatchers.IO) {
             val fileNames: MutableList<String> = mutableListOf<String>()
             val cmdSplit: List<String> = command.split("\\s+".toRegex())
@@ -62,12 +66,12 @@ class DBDataManager(
                     OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
                     formatRegex(cmdSplit)
                 }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
-                LIMIT 40"""
-            db.prepare(query).use { statement ->
-                while (statement.step()) {
-                    fileNames.add(statement.getText(0))
+                LIMIT $limit"""
+            db.rawQuery(query).use {
+                while (it.moveToNext()) {
+                    fileNames.add(it.getString(0))
                 }
-                statement.close()
+                it.close()
             }
             sortData(fileNames, command)
             return@withContext fileNames
@@ -101,10 +105,10 @@ class DBDataManager(
         return withContext(Dispatchers.IO) {
             var content: String
             val query = "SELECT content FROM file WHERE filename = '$command'"
-            db.prepare(query).use { statement ->
-                statement.step()
-                content = statement.getText(0)
-                statement.close()
+            db.rawQuery(query).use {
+                it.moveToFirst()
+                content = it.getString(0)
+                it.close()
             }
             return@withContext content
         }
@@ -114,5 +118,9 @@ class DBDataManager(
         var reg = ""
         for (word in commandSplit) reg += "$word* "
         return reg.trimEnd()
+    }
+
+    fun close() {
+        dbMan.close()
     }
 }

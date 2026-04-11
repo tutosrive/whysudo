@@ -29,7 +29,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.utils.DBDataManager
-import com.srm.whysudo.utils.MarkwonManager
+import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
     private lateinit var ctnInfoText: View
     private lateinit var commandInfoText: TextView
-    private lateinit var markman: MarkwonManager
+    private lateinit var markman: MarkdownManager
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
     private lateinit var listCommands: ListView
@@ -59,13 +59,12 @@ class MainActivity : AppCompatActivity() {
         }
         @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
         ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
         footerTxt = findViewById<TextView>(R.id.footerText)
         listCommands = findViewById<ListView>(R.id.listCommands)
-        markman = MarkwonManager(this)
+        markman = MarkdownManager(this)
         loadFooterDate()
 
         dbDataManager = DBDataManager(
@@ -86,7 +85,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loadingStatus(): Unit {
-        inputCommandSearch.isEnabled = false
+        mainScope.launch {
+            inputCommandSearch.isEnabled = false
+            setViewVisibility(ctnInfoText, View.VISIBLE)
+            commandInfoText.text = getString(R.string.loading_msg)
+        }
     }
 
     private fun loadFooterDate() {
@@ -95,12 +98,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addListenerEvent(): Unit {
-        showDefaultCommandHint()
-        inputCommandSearch.isEnabled = true
+        mainScope.launch {
+            showDefaultCommandHint()
+            inputCommandSearch.isEnabled = true
 
-        inputCommandSearch.hint = getString(R.string.input_search_main_hint)
-        inputCommandSearch.doOnTextChanged { text, _, before, count ->
-            changeRealTimeText(text, before, count)
+            inputCommandSearch.hint = getString(R.string.input_search_main_hint)
+            inputCommandSearch.doOnTextChanged { text, _, before, count ->
+                changeRealTimeText(text, before, count)
+            }
         }
     }
 
@@ -123,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         var data: List<String>? = null
         try {
             data = dbDataManager.getFileNames(command)
-        } catch (error: Exception) {
+        } catch (e: Exception) {
             showDefaultCommandHint()
         }
         return data
@@ -187,6 +192,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        dbDataManager.close()
         mainScope.cancel()
     }
 }

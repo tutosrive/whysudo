@@ -23,9 +23,10 @@
     <string name="about_page_title">About</string>
     <string name="about_btn_description">Go to About section</string>
     <string name="input_search_main_hint">Search</string>
-    <string name="footer_message">© YEAR - [tutosrive](https://github.com/tutosrive)</string>
-    <string name="hint_main_info_command">Try Search a command: `apt`</string>
+    <string name="footer_message">© YEAR - tutosrive</string>
+    <string name="hint_main_info_command">Try Search a command: `apt` or `install pack`</string>
     <string name="loading_msg">Loading...</string>
     <string name="try_reload_msg">Sorry, try reload again...</string>
     <string name="description_logo_image">\"Why Sudo\" Logo</string>
+    <string name="copy_clipboard_successfully">Command Copied</string>
 </resources>

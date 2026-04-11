@@ -15,7 +15,7 @@
 package com.srm.whysudo.enums
 
 enum class DataFileName(val filename: String) {
-    DB_COMMANDS("data-linux.srm.db"),
+    DB_COMMANDS("data-linux.enc.srm"),
     ABOUT("about.srm");
 
     operator fun invoke() = filename

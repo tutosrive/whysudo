@@ -15,11 +15,32 @@
 package com.srm.whysudo.database_man
 
 import android.content.Context
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import androidx.sqlite.driver.bundled.SQLITE_OPEN_READONLY
+import net.zetetic.database.sqlcipher.SQLiteConnection
+import net.zetetic.database.sqlcipher.SQLiteDatabase
+import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
 
 class DbManager(dbName: String, ctx: Context) {
-    private val driver = BundledSQLiteDriver()
-    val conn =
-        driver.open(fileName = "${ctx.getDatabasePath(dbName).absolutePath}", SQLITE_OPEN_READONLY)
+    var conn: SQLiteDatabase
+
+    init {
+        System.loadLibrary("sqlcipher")
+        conn = SQLiteDatabase.openDatabase(
+            "${ctx.getDatabasePath(dbName).absolutePath}",
+            $$"$argon2id$v=19$m=19456,t=17,p=4$YmZmMTFkODAyMjQxYjA0NzI2Y2Q0MWU5NzU2MmVlNDU$tiW78vf8mwKwV7HFq1yhVJmJy4dxBkXcH0KHTEqO5fxRXTX3JxqBokdc286cC0CFElKlDjCPn3LrUXLLM78Fww",
+            null, SQLiteDatabase.OPEN_READONLY,
+            H
+        )
+    }
+
+    fun close() {
+        conn.close()
+    }
+
+    object H : SQLiteDatabaseHook {
+        override fun preKey(p0: SQLiteConnection?) {}
+
+        override fun postKey(p0: SQLiteConnection?) {
+            p0?.execute("PRAGMA kdf_iter = 5000;", null, null)
+        }
+    }
 }

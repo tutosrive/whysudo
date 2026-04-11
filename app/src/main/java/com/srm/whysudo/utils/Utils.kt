@@ -14,8 +14,11 @@
 
 package com.srm.whysudo.utils
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.widget.TextView
+import com.srm.whysudo.markdown.MarkdownManager
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -41,7 +44,7 @@ object Utils {
         return getNow().get(Calendar.YEAR)
     }
 
-    fun setFooterContent(footer: TextView, strFooter: String, markman: MarkwonManager) {
+    fun setFooterContent(footer: TextView, strFooter: String, markman: MarkdownManager) {
         val year: Int = getNowYear()
         var text: String = ""
         if (strFooter.contains("YEAR")) text = strFooter.replace("YEAR", "$year")
@@ -67,5 +70,15 @@ object Utils {
             }
         } catch (e: Exception) {
         }
+    }
+
+    fun scalePixelToRealSize(ctx: Context, pixel: Int): Int {
+        return (pixel * ctx.resources.displayMetrics.density).toInt()
+    }
+
+    fun copyToClipboard(ctx: Context, msg: String, content: String): Unit {
+        val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val data = ClipData.newPlainText(msg, content)
+        clipboard.setPrimaryClip(data)
     }
 }
