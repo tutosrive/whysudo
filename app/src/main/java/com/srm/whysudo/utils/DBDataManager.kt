@@ -26,8 +26,8 @@ import net.zetetic.database.sqlcipher.SQLiteDatabase
 
 class DBDataManager(
     private val ctx: Context,
-    val callbackOnStartLoad: () -> Unit,
-    val callbackOnFinishLoad: () -> Unit
+    val callbackOnStartLoad: (() -> Unit)? = null,
+    val callbackOnFinishLoad: (() -> Unit)? = null
 ) {
     val fileDataName: String = DataFileName.DB_COMMANDS()
     private lateinit var dbMan: DbManager
@@ -41,14 +41,14 @@ class DBDataManager(
     private fun loadData() {
         try {
             val job = CoroutineScope(Dispatchers.IO).launch {
-                callbackOnStartLoad()
+                callbackOnStartLoad?.invoke()
                 Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
                 dbMan = DbManager(fileDataName, ctx)
             }
 
             job.invokeOnCompletion {
                 db = dbMan.conn
-                callbackOnFinishLoad()
+                callbackOnFinishLoad?.invoke()
             }
         } catch (e: Exception) {
             Toast.makeText(ctx, "Try Re-Open the aplication", Toast.LENGTH_SHORT).show()
@@ -111,6 +111,20 @@ class DBDataManager(
                 it.close()
             }
             return@withContext content
+        }
+    }
+
+    suspend fun getAllCommands(): List<String> {
+        return withContext(Dispatchers.IO) {
+            val filenames: MutableList<String> = mutableListOf()
+            val query = "SELECT filename FROM file where id < 800"
+            db.rawQuery(query).use {
+                while (it.moveToNext()) {
+                    filenames.add(it.getString(0))
+                }
+                it.close()
+            }
+            return@withContext filenames
         }
     }
 

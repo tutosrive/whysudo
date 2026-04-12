@@ -20,13 +20,17 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.markdown.MarkdownManager
@@ -45,7 +49,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var footerTxt: TextView
     private lateinit var listCommands: ListView
     private lateinit var commandsListElements: List<String>
-    private val tag: String? = this::class.simpleName
+    private lateinit var btnSeeAllCommands: ImageButton
+    private val waitResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            val command = data?.getStringExtra("command")
+            lifecycleScope.launch {
+                showCommandContent("$command")
+            }
+        }
+    }
+
     val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
         footerTxt = findViewById<TextView>(R.id.footerText)
         listCommands = findViewById<ListView>(R.id.listCommands)
+        btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
         markman = MarkdownManager(this)
         loadFooterDate()
 
@@ -73,6 +90,7 @@ class MainActivity : AppCompatActivity() {
             callbackOnFinishLoad = { addListenerEvent() }
         )
         listCommands.onItemClickListener = handleListItemClick()
+        btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
     }
 
     private fun handleListItemClick(): AdapterView.OnItemClickListener {
@@ -87,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     fun loadingStatus(): Unit {
         mainScope.launch {
             inputCommandSearch.isEnabled = false
-            setViewVisibility(ctnInfoText, View.VISIBLE)
+            Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
             commandInfoText.text = getString(R.string.loading_msg)
         }
     }
@@ -150,16 +168,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun showCommandContent(name: String): Unit {
-        setViewVisibility(listCommands, View.INVISIBLE)
-        setViewVisibility(ctnInfoText, View.VISIBLE)
+        Utils.setViewVisibility(listCommands, View.INVISIBLE)
+        Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         val content = dbDataManager.getCommandContent(name)
         markman.setMark(content, commandInfoText)
     }
 
     private suspend fun showCommandList(list: List<String>): Unit {
         commandsListElements = list
-        setViewVisibility(ctnInfoText, View.GONE)
-        setViewVisibility(listCommands, View.VISIBLE)
+        Utils.setViewVisibility(ctnInfoText, View.GONE)
+        Utils.setViewVisibility(listCommands, View.VISIBLE)
 
         val elements: ArrayAdapter<String> = ArrayAdapter(
             this,
@@ -170,24 +188,19 @@ class MainActivity : AppCompatActivity() {
         listCommands.adapter = elements
     }
 
-    private fun setViewVisibility(view: View, value: Int): Unit {
-        val viewVisibility = view.visibility
-
-        if (viewVisibility != value) {
-            view.visibility = value
-        }
-    }
-
     private fun showDefaultCommandHint(): Unit {
-        setViewVisibility(ctnInfoText, View.VISIBLE)
-        setViewVisibility(listCommands, View.INVISIBLE)
+        Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
+        Utils.setViewVisibility(listCommands, View.INVISIBLE)
         markman.setMark(getString(R.string.hint_main_info_command), commandInfoText)
     }
 
-    @Suppress("Unused")
-    fun goAbout(view: View): Unit {
-        val intent = Intent(this, About::class.java)
-        startActivity(intent)
+    fun goAbout(v: View): Unit {
+        Utils.goToAnActivity(this, v, About::class.java)
+    }
+
+    private fun goAllCommands(v: View): Unit {
+        val intent = Intent(this, AllCommands::class.java)
+        waitResult.launch(intent)
     }
 
     override fun onDestroy() {

@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2026 tutosrive. All rights reserved.
-  ~
-  ~ Author: tutosrive
-  ~ GitHub: https://github.com/tutosrive
-  ~
-  ~ This source code is PROPRIETARY and CONFIDENTIAL.
-  ~ Unauthorized copying, modification, or distribution of this file,
-  ~ via any medium, is strictly prohibited.
-  ~
-  ~ This software is provided "as is", without warranty of any kind.
-  ~ In no event shall the author be liable for any claim or damages.
-  -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -25,6 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Testxml">
+        <activity
+            android:name=".AllCommands"
+            android:exported="false" />
         <activity
             android:name=".About"
             android:exported="false" />

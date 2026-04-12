@@ -64,7 +64,8 @@
                     android:gravity="center"
                     android:onClick="ctaClick"
                     android:text="@string/about_page_title"
-                    android:textColor="@color/text_color_on_dark" />
+                    android:textColor="@color/text_color_on_dark"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
