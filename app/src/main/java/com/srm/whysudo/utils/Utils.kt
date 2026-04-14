@@ -17,6 +17,8 @@ package com.srm.whysudo.utils
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.view.View
 import android.widget.TextView
 import com.srm.whysudo.markdown.MarkdownManager
 import java.io.File
@@ -80,5 +82,18 @@ object Utils {
         val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val data = ClipData.newPlainText(msg, content)
         clipboard.setPrimaryClip(data)
+    }
+
+    fun goToAnActivity(ctx: Context, v: View, c: Class<*>): Unit {
+        val intentActivity = Intent(ctx, c)
+        ctx.startActivity(intentActivity)
+    }
+
+    fun setViewVisibility(view: View, value: Int): Unit {
+        val viewVisibility = view.visibility
+
+        if (viewVisibility != value) {
+            view.visibility = value
+        }
     }
 }

@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-val versionApp = "0.2.6"
+val versionApp = "0.2.7"
 
 base {
     archivesName.set("WhySudo-v$versionApp")
@@ -53,7 +53,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true // Just when is release
-            // isShrinkResources = false // Just in AAB Release
+//            isShrinkResources = false // Just in AAB Release
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -73,6 +73,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
+    }
+    buildFeatures {
+        viewBinding = true
     }
 }
 

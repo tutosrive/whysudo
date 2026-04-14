@@ -64,14 +64,16 @@
                     android:gravity="center"
                     android:onClick="ctaClick"
                     android:text="@string/about_page_title"
-                    android:textColor="@color/text_color_on_dark" />
+                    android:textColor="@color/text_color_on_dark"
+                    android:textSize="20sp" />
 
             </LinearLayout>
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@mipmap/ic_launcher" />
+                android:contentDescription="@string/description_logo_image"
+                app:srcCompat="@mipmap/ic_launcher_foreground" />
 
             <LinearLayout
                 android:layout_width="match_parent"
