@@ -117,7 +117,7 @@ class DBDataManager(
     suspend fun getAllCommands(): List<String> {
         return withContext(Dispatchers.IO) {
             val filenames: MutableList<String> = mutableListOf()
-            val query = "SELECT filename FROM file where id < 800"
+            val query = "SELECT filename FROM file"
             db.rawQuery(query).use {
                 while (it.moveToNext()) {
                     filenames.add(it.getString(0))

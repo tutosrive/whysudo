@@ -17,7 +17,6 @@ package com.srm.whysudo.markdown
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.text.Spanned
 import android.text.method.ScrollingMovementMethod
 import android.widget.TextView
 import android.widget.Toast
@@ -69,8 +68,6 @@ class MarkdownManager(val ctx: Context) {
     }
 
     private fun codeStyles(b: MarkwonTheme.Builder) {
-        val textSize: Int = Utils.scalePixelToRealSize(ctx, 14)
-        val codeBlockMargin: Int = Utils.scalePixelToRealSize(ctx, 5)
         val blockTextSize: Int = Utils.scalePixelToRealSize(ctx, 12)
         val bgColor: Int = ctx.getColor(R.color.dark_blue)
         val textColor: Int = ctx.getColor(R.color.code_block_color)

@@ -31,10 +31,10 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="@string/description_logo_image"
-            android:scaleType="fitStart"
+            android:scaleType="center"
             android:translationX="10dp"
             android:translationY="10sp"
-            app:srcCompat="@mipmap/ic_launcher" />
+            app:srcCompat="@mipmap/ic_launcher_foreground" />
 
         <ImageButton
             android:id="@+id/allCommandsBtn"
@@ -43,6 +43,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="50dp"
             android:backgroundTint="#00FFFFFF"
+            android:contentDescription="@string/description_btn_go_all_commands"
             app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
 
         <ImageButton
