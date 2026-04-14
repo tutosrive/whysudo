@@ -56,10 +56,14 @@ class AllCommands : AppCompatActivity() {
         loadingL = findViewById<LinearLayout>(R.id.loadingLayout)
         errorL = findViewById<LinearLayout>(R.id.erroLayout)
 
-        dbMan = DBDataManager(this)
+        dbMan = DBDataManager(
+            this,
+            ::dataOnStartLoad,
+            ::loadCommandsData
+        )
 
         viewListCommands.onItemClickListener = loadCommand()
-        loadCommandsData()
+//        loadCommandsData()
     }
 
     private fun loadDataIntoView(): Unit {
@@ -82,7 +86,7 @@ class AllCommands : AppCompatActivity() {
 
     private fun loadCommandsData(): Unit {
         mainScope.launch {
-            dataOnStartLoad()
+//            dataOnStartLoad()
             allCommands = dbMan.getAllCommands()
             delay(300)
             dataOnFinishLoad()
