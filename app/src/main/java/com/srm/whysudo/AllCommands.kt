@@ -63,7 +63,6 @@ class AllCommands : AppCompatActivity() {
         )
 
         viewListCommands.onItemClickListener = loadCommand()
-//        loadCommandsData()
     }
 
     private fun loadDataIntoView(): Unit {
@@ -86,7 +85,6 @@ class AllCommands : AppCompatActivity() {
 
     private fun loadCommandsData(): Unit {
         mainScope.launch {
-//            dataOnStartLoad()
             allCommands = dbMan.getAllCommands()
             delay(300)
             dataOnFinishLoad()

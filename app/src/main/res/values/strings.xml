@@ -30,6 +30,7 @@
     <string name="description_logo_image">\"Why Sudo\" Logo</string>
     <string name="copy_clipboard_successfully">Command Copied</string>
     <string name="description_back_button">Go Back</string>
+    <string name="description_icon_warning">Icon Yellow Warning</string>
     <string name="title_all_commands_activity">Linux Commands</string>
     <string name="description_btn_go_all_commands">Go To All Commands Section</string>
 </resources>
