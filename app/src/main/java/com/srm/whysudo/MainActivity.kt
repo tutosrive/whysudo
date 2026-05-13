@@ -188,6 +188,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showDefaultCommandHint(): Unit {
+        // TODO: Add a method to always load a random command by default
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
         markman.setMark(getString(R.string.hint_main_info_command), commandInfoText)

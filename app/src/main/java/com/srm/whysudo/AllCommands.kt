@@ -86,6 +86,7 @@ class AllCommands : AppCompatActivity() {
     private fun loadCommandsData(): Unit {
         mainScope.launch {
             allCommands = dbMan.getAllCommands()
+            // TODO: Decrease the initial load time (DB is loaded so fast ...)
             delay(300)
             dataOnFinishLoad()
         }

@@ -13,7 +13,7 @@
  */
 
 package com.srm.whysudo
-
+// TODO: Add buttons and logic to load licenses
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
