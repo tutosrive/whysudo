@@ -25,6 +25,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.Calendar
+import kotlin.random.Random
 
 object Utils {
     fun loadAssetFile(ctx: Context, filename: String): InputStream {
@@ -95,5 +96,9 @@ object Utils {
         if (viewVisibility != value) {
             view.visibility = value
         }
+    }
+
+    fun getRandomIdInt(): Int {
+        return Random.nextInt(1, 1826)
     }
 }

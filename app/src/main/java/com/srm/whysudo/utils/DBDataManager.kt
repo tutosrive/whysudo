@@ -15,6 +15,7 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
@@ -125,6 +126,21 @@ class DBDataManager(
                 it.close()
             }
             return@withContext filenames
+        }
+    }
+
+    suspend fun getCommandById(id: Int): String {
+        return withContext(Dispatchers.IO) {
+            val query = "SELECT content from file WHERE id = $id"
+            Log.i(this::class.simpleName, "Query => $query")
+            var content = ""
+
+            db.rawQuery(query).use {
+                it.moveToFirst()
+                content = it.getString(0)
+            }
+
+            return@withContext content
         }
     }
 

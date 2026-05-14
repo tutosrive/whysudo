@@ -24,7 +24,7 @@
     <string name="about_btn_description">Go to About section</string>
     <string name="input_search_main_hint">Search</string>
     <string name="footer_message">© YEAR - tutosrive</string>
-    <string name="hint_main_info_command">Try Search a command: `apt` or `install pack`</string>
+    <string name="hint_main_info_command">> Try Search a command: `apt` or `install pack`</string>
     <string name="loading_msg">Loading…</string>
     <string name="try_reload_msg">Sorry, try reload again…</string>
     <string name="description_logo_image">\"Why Sudo\" Logo</string>
@@ -33,4 +33,5 @@
     <string name="description_icon_warning">Icon Yellow Warning</string>
     <string name="title_all_commands_activity">Linux Commands</string>
     <string name="description_btn_go_all_commands">Go To All Commands Section</string>
+    <string name="default_command_note_header">## Anyway gentlemen, run this command:</string>
 </resources>

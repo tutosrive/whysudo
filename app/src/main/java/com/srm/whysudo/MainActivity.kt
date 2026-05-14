@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
     private lateinit var listCommands: ListView
-    private lateinit var commandsListElements: List<String>
+    private lateinit var commandsListValues: List<String>
     private lateinit var btnSeeAllCommands: ImageButton
     private val waitResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleListItemClick(): AdapterView.OnItemClickListener {
         return AdapterView.OnItemClickListener { _, _, pos, _ ->
             mainScope.launch {
-                val commandSelected = commandsListElements[pos]
+                val commandSelected = commandsListValues[pos]
                 showCommandContent(commandSelected)
             }
         }
@@ -137,7 +137,9 @@ class MainActivity : AppCompatActivity() {
                 showCommandOrList(fileNames)
             }
 
-            else -> showDefaultCommandHint()
+            else -> {
+                mainScope.launch { showDefaultCommandHint() }
+            }
         }
     }
 
@@ -174,7 +176,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun showCommandList(list: List<String>): Unit {
-        commandsListElements = list
+        commandsListValues = list
         Utils.setViewVisibility(ctnInfoText, View.GONE)
         Utils.setViewVisibility(listCommands, View.VISIBLE)
 
@@ -187,11 +189,21 @@ class MainActivity : AppCompatActivity() {
         listCommands.adapter = elements
     }
 
-    private fun showDefaultCommandHint(): Unit {
+    private suspend fun showDefaultCommandHint(): Unit {
         // TODO: Add a method to always load a random command by default
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
-        markman.setMark(getString(R.string.hint_main_info_command), commandInfoText)
+        val placeholderDefault = getString(R.string.hint_main_info_command)
+        val msg = showRandomCommand(placeholderDefault)
+        markman.setMark(msg, commandInfoText)
+    }
+
+    private suspend fun showRandomCommand(initialMessage: String): String {
+        val id = Utils.getRandomIdInt()
+        val command = dbDataManager.getCommandById(id)
+        val noteMsg = getString(R.string.default_command_note_header)
+        val msg = "${initialMessage}\n---\n${noteMsg}\n---\n${command}"
+        return msg
     }
 
     fun goAbout(v: View): Unit {
