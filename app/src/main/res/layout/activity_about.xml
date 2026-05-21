@@ -156,28 +156,29 @@
         <LinearLayout
             android:id="@+id/LCtnLicenses"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/rounded_background"
+            android:backgroundTint="@color/background_dark_glass"
             android:orientation="vertical"
             android:padding="10dp"
-            android:paddingTop="20dp"
             android:visibility="gone">
 
             <TextView
                 android:id="@+id/titleLicense"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/background_dark_glass"
+                android:layout_height="48dp"
                 android:gravity="center_horizontal"
-                android:padding="10dp"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="500dp"
-                android:background="@color/background_dark_glass"
-                android:padding="10dp">
+                android:layout_height="600dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -188,8 +189,7 @@
                         android:id="@+id/licenseText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_horizontal"
-                        android:padding="5dp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
             </ScrollView>
 
@@ -199,7 +199,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="20dp"
-                android:background="@color/background_dark_glass"
+                android:background="#00FFFFFF"
                 android:contentDescription="@string/description_back_button"
                 android:onClick="closeLicense"
                 app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
