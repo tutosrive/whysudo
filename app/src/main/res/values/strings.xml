@@ -34,4 +34,10 @@
     <string name="title_all_commands_activity">Linux Commands</string>
     <string name="description_btn_go_all_commands">Go To All Commands Section</string>
     <string name="default_command_note_header">## Anyway gentlemen, run this command:</string>
+    <string name="btn_license_markwon">Markwon License</string>
+    <string name="btn_license_androidx">Androidx License</string>
+    <string name="btn_license_sqlcipher">Sqlcipher License</string>
+    <string name="description_btn_androidx">license_androidx</string>
+    <string name="description_btn_markwon">license_markwon</string>
+    <string name="description_btn_sqlcipher">license_sqlcipher</string>
 </resources>

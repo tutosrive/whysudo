@@ -26,6 +26,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.Calendar
 import kotlin.random.Random
+import com.srm.whysudo.enums.DataFileName as dfn
 
 object Utils {
     fun loadAssetFile(ctx: Context, filename: String): InputStream {
@@ -75,6 +76,30 @@ object Utils {
         }
     }
 
+    fun loadLicensesFiles(ctx: Context) {
+        val filenames = listOf(
+            dfn.LICENSE_MARKWON(),
+            dfn.LICENSE_SQLCIPHER(),
+            dfn.LICENSE_ANDROIDX()
+        )
+
+        filenames.forEach {
+            copyFileFromAssets(ctx, it)
+        }
+    }
+
+    fun readInternalFile(ctx: Context, filename: String): String {
+        var content = ""
+        try {
+            val file = File("${ctx.filesDir}/$filename")
+            file.bufferedReader().use {
+                content = it.readText()
+            }
+        } catch (e: Exception) {
+        }
+        return content
+    }
+
     fun scalePixelToRealSize(ctx: Context, pixel: Int): Int {
         return (pixel * ctx.resources.displayMetrics.density).toInt()
     }
@@ -100,5 +125,14 @@ object Utils {
 
     fun getRandomIdInt(): Int {
         return Random.nextInt(1, 1826)
+    }
+
+    fun snakeCaseToCapital(text: String): String {
+        val initVal = text.replace("_", " ")
+        val res = initVal.split(" ").joinToString(" ") { word ->
+            word.replaceFirstChar { it.uppercase() }
+        }
+
+        return res
     }
 }

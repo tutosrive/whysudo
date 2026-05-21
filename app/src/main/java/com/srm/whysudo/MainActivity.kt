@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         )
         listCommands.onItemClickListener = handleListItemClick()
         btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
+        Utils.loadLicensesFiles(this)
     }
 
     private fun handleListItemClick(): AdapterView.OnItemClickListener {
@@ -190,7 +191,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun showDefaultCommandHint(): Unit {
-        // TODO: Add a method to always load a random command by default
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
         val placeholderDefault = getString(R.string.hint_main_info_command)

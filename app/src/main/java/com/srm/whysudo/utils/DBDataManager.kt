@@ -132,7 +132,6 @@ class DBDataManager(
     suspend fun getCommandById(id: Int): String {
         return withContext(Dispatchers.IO) {
             val query = "SELECT content from file WHERE id = $id"
-            Log.i(this::class.simpleName, "Query => $query")
             var content = ""
 
             db.rawQuery(query).use {

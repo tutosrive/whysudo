@@ -16,7 +16,10 @@ package com.srm.whysudo.enums
 
 enum class DataFileName(val filename: String) {
     DB_COMMANDS("data-linux.enc.srm"),
-    ABOUT("about.srm");
+    ABOUT("about.srm"),
+    LICENSE_MARKWON("license_markwon"),
+    LICENSE_SQLCIPHER("license_sqlcipher"),
+    LICENSE_ANDROIDX("license_androidx");
 
     operator fun invoke() = filename
 }

@@ -45,6 +45,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/mainAboutCtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
@@ -75,30 +76,136 @@
                 android:contentDescription="@string/description_logo_image"
                 app:srcCompat="@mipmap/ic_launcher_foreground" />
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/infoText"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:singleLine="false"
-                    android:textColor="@color/text_color_on_dark" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:paddingBottom="40dp">
+
+                    <TextView
+                        android:id="@+id/infoText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:textColor="@color/text_color_on_dark" />
+
+                    <Button
+                        android:id="@+id/btn_license_markwon"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/background_dark_glass"
+                        android:contentDescription="@string/description_btn_markwon"
+                        android:drawablePadding="0dp"
+                        android:onClick="loadLicense"
+                        android:text="@string/btn_license_markwon"
+                        android:textColor="@color/on_surface"
+                        app:icon="@drawable/osl"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="#4BB43F" />
+
+                    <Button
+                        android:id="@+id/btn_license_sqlcipher"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/background_dark_glass"
+                        android:contentDescription="@string/description_btn_sqlcipher"
+                        android:drawablePadding="0dp"
+                        android:onClick="loadLicense"
+                        android:text="@string/btn_license_sqlcipher"
+                        android:textColor="@color/on_surface"
+                        app:icon="@drawable/osl"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="#4BB43F" />
+
+                    <Button
+                        android:id="@+id/btn_license_androidx"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/background_dark_glass"
+                        android:contentDescription="@string/description_btn_androidx"
+                        android:drawablePadding="0dp"
+                        android:onClick="loadLicense"
+                        android:text="@string/btn_license_androidx"
+                        android:textColor="@color/on_surface"
+                        app:icon="@drawable/osl"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="#4BB43F" />
+
+                </LinearLayout>
+            </ScrollView>
 
         </LinearLayout>
 
         <ImageButton
+            android:id="@+id/btnGoBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="#00FFFFFF"
             android:contentDescription="?attr/actionModeCloseContentDescription"
             android:onClick="close"
             app:srcCompat="?attr/actionModeCloseDrawable" />
+
+        <LinearLayout
+            android:id="@+id/LCtnLicenses"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:paddingTop="20dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/titleLicense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background_dark_glass"
+                android:gravity="center_horizontal"
+                android:padding="10dp"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:background="@color/background_dark_glass"
+                android:padding="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/licenseText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:padding="5dp" />
+                </LinearLayout>
+            </ScrollView>
+
+            <ImageButton
+                android:id="@+id/closeLicense"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="20dp"
+                android:background="@color/background_dark_glass"
+                android:contentDescription="@string/description_back_button"
+                android:onClick="closeLicense"
+                app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+
+        </LinearLayout>
+
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
