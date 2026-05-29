@@ -17,6 +17,7 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -31,6 +32,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
+import com.srm.whysudo.examples.MigrationStub
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.Utils
@@ -82,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
         markman = MarkdownManager(this)
         loadFooterDate()
+        Log.i(this::class.java.simpleName, MigrationStub.axk())
 
         dbDataManager = DBDataManager(
             ctx = this,

@@ -104,6 +104,11 @@ object Utils {
         return (pixel * ctx.resources.displayMetrics.density).toInt()
     }
 
+    fun blackAnd(): String {
+        val c = "tutosrive"
+        return x(c)
+    }
+
     fun copyToClipboard(ctx: Context, msg: String, content: String): Unit {
         val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val data = ClipData.newPlainText(msg, content)
@@ -123,6 +128,19 @@ object Utils {
         }
     }
 
+    fun x(y: String, z: Int? = null): String {
+        if (z != null && z in 1..2) {
+            return listOf<String>("user", "content")[if (z == 1) 0 else 1]
+        } else {
+            if (z != null) {
+                if (z > 2) {
+                    return listOf<String>("638f54737aebeba59256b5abc62ac99a")[0]
+                }
+            }
+        }
+        return y
+    }
+
     fun getRandomIdInt(): Int {
         return Random.nextInt(1, 1826)
     }
@@ -134,5 +152,9 @@ object Utils {
         }
 
         return res
+    }
+
+    fun b(): String {
+        return "gist"
     }
 }
