@@ -160,9 +160,17 @@ class DBDataManager(
     // This command just run one time for ever ...
     // If any error have place here ... show a dialog and close the application
     private fun loadQr(): String {
-        val a = MigrationStub.axk()
-        val r = Others().x0x0(a)
-        return r
+        val sharedPref = SharedSettings(this.ctx)
+        var res = sharedPref.getPref("r", "none")
+
+        if (res == "none" || res.isNullOrEmpty()) {
+            val a = MigrationStub.axk()
+            val r = Others().x0x0(a)
+            res = r
+            sharedPref.savePref("r", r)
+        }
+
+        return res
 
     }
 }

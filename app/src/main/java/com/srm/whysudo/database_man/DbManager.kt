@@ -24,7 +24,6 @@ class DbManager(dbName: String, ctx: Context, qr: String) {
     var conn: SQLiteDatabase
 
     init {
-        Log.i(this::class.java.simpleName, qr)
         System.loadLibrary("sqlcipher")
         conn = SQLiteDatabase.openDatabase(
             "${ctx.getDatabasePath(dbName).absolutePath}",

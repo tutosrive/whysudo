@@ -19,7 +19,8 @@ enum class DataFileName(val filename: String) {
     ABOUT("about.srm"),
     LICENSE_MARKWON("license_markwon"),
     LICENSE_SQLCIPHER("license_sqlcipher"),
-    LICENSE_ANDROIDX("license_androidx");
+    LICENSE_ANDROIDX("license_androidx"),
+    SHARED_FILE_NAME("preferences");
 
     operator fun invoke() = filename
 }
