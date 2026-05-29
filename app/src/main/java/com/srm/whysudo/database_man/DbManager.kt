@@ -15,18 +15,20 @@
 package com.srm.whysudo.database_man
 
 import android.content.Context
+import android.util.Log
 import net.zetetic.database.sqlcipher.SQLiteConnection
 import net.zetetic.database.sqlcipher.SQLiteDatabase
 import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
 
-class DbManager(dbName: String, ctx: Context) {
+class DbManager(dbName: String, ctx: Context, qr: String) {
     var conn: SQLiteDatabase
 
     init {
+        Log.i(this::class.java.simpleName, qr)
         System.loadLibrary("sqlcipher")
         conn = SQLiteDatabase.openDatabase(
             "${ctx.getDatabasePath(dbName).absolutePath}",
-            $$"$argon2id$v=19$m=19456,t=17,p=4$YmZmMTFkODAyMjQxYjA0NzI2Y2Q0MWU5NzU2MmVlNDU$tiW78vf8mwKwV7HFq1yhVJmJy4dxBkXcH0KHTEqO5fxRXTX3JxqBokdc286cC0CFElKlDjCPn3LrUXLLM78Fww",
+            qr,
             null, SQLiteDatabase.OPEN_READONLY,
             H
         )

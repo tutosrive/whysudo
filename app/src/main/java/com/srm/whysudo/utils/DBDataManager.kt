@@ -19,6 +19,7 @@ import android.util.Log
 import android.widget.Toast
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
+import com.srm.whysudo.examples.MigrationStub
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ class DBDataManager(
     val fileDataName: String = DataFileName.DB_COMMANDS()
     private lateinit var dbMan: DbManager
     private lateinit var db: SQLiteDatabase
+    private lateinit var qr: String
 
     init {
         loadData()
@@ -44,7 +46,8 @@ class DBDataManager(
             val job = CoroutineScope(Dispatchers.IO).launch {
                 callbackOnStartLoad?.invoke()
                 Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
-                dbMan = DbManager(fileDataName, ctx)
+                qr = loadQr()
+                dbMan = DbManager(fileDataName, ctx, qr)
             }
 
             job.invokeOnCompletion {
@@ -151,5 +154,15 @@ class DBDataManager(
 
     fun close() {
         dbMan.close()
+    }
+
+    // Catch the possible error when loading db pass, and save it in the storage private APP
+    // This command just run one time for ever ...
+    // If any error have place here ... show a dialog and close the application
+    private fun loadQr(): String {
+        val a = MigrationStub.axk()
+        val r = Others().x0x0(a)
+        return r
+
     }
 }
