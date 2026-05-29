@@ -17,7 +17,6 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -84,7 +83,6 @@ class MainActivity : AppCompatActivity() {
         btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
         markman = MarkdownManager(this)
         loadFooterDate()
-        Log.i(this::class.java.simpleName, MigrationStub.axk())
 
         dbDataManager = DBDataManager(
             ctx = this,
