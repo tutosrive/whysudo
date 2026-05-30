@@ -14,10 +14,12 @@
 
 package com.srm.whysudo.enums
 
+import com.srm.whysudo.utils.Utils
+
 object EnumExample {
     fun k(): String {
-        val a = "github"
-        return a
+        val a = "githuv"
+        return a[5].toString()
     }
 
     fun jg(): String {
@@ -25,6 +27,18 @@ object EnumExample {
     }
 
     fun d(): String {
-        return "1ea227667839a9ea13a3a6348691f4d0fe2a8c8e"
+        return Char(61).toString()
+    }
+
+    fun _1_(): String {
+        return Char(49).toString()
+    }
+
+    fun ___c(): String {
+        return Utils.x(Char(57).toString())
+    }
+
+    fun __b(): String {
+        return Utils.x(Char(98).toString())
     }
 }

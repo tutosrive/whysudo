@@ -15,7 +15,6 @@
 package com.srm.whysudo.database_man
 
 import android.content.Context
-import android.util.Log
 import net.zetetic.database.sqlcipher.SQLiteConnection
 import net.zetetic.database.sqlcipher.SQLiteDatabase
 import net.zetetic.database.sqlcipher.SQLiteDatabaseHook

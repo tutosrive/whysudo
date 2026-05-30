@@ -22,6 +22,7 @@ import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.examples.MigrationStub
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.zetetic.database.sqlcipher.SQLiteDatabase
@@ -29,33 +30,55 @@ import net.zetetic.database.sqlcipher.SQLiteDatabase
 class DBDataManager(
     private val ctx: Context,
     val callbackOnStartLoad: (() -> Unit)? = null,
-    val callbackOnFinishLoad: (() -> Unit)? = null
+    val callbackOnFinishLoad: (() -> Unit)? = null,
+    val callbackOnError: (() -> Unit)? = null
 ) {
     val fileDataName: String = DataFileName.DB_COMMANDS()
     private lateinit var dbMan: DbManager
     private lateinit var db: SQLiteDatabase
-    private lateinit var qr: String
+    private val qr: String = loadQr()
 
     init {
-        loadData()
+        if (qr.length == 162) {
+            loadData()
+        } else {
+            callbackOnError?.invoke()
+        }
     }
 
 
     private fun loadData() {
         try {
             val job = CoroutineScope(Dispatchers.IO).launch {
-                callbackOnStartLoad?.invoke()
-                Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
-                qr = loadQr()
-                dbMan = DbManager(fileDataName, ctx, qr)
+                try {
+                    Log.i("DBManager", "Empece trabajo 1")
+                    callbackOnStartLoad?.invoke()
+                    Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
+                } catch (e: Exception) {
+                    throw e
+                }
             }
 
             job.invokeOnCompletion {
-                db = dbMan.conn
-                callbackOnFinishLoad?.invoke()
+                Log.i("DBManager", "Terminé trabajo 1")
+                try {
+                    val job2 = CoroutineScope(Dispatchers.IO).launch {
+                        Log.i("DBManager", "Empece trabajo 2")
+                        dbMan = DbManager(fileDataName, ctx, qr)
+                    }
+                    job2.invokeOnCompletion {
+                        Log.i("DBManager", "Terminé trabajo 2")
+                        db = dbMan.conn
+                        callbackOnFinishLoad?.invoke()
+                    }
+                } catch (e: Exception) {
+                    throw e
+                }
             }
+
         } catch (e: Exception) {
-            Toast.makeText(ctx, "Try Re-Open the aplication", Toast.LENGTH_SHORT).show()
+            callbackOnError?.invoke()
+//            Toast.makeText(ctx, "Try Re-Open the aplication", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -163,12 +186,16 @@ class DBDataManager(
         val sharedPref = SharedSettings(this.ctx)
         var res = sharedPref.getPref("r", "none")
 
-        if (res == "none" || res.isNullOrEmpty()) {
+        Log.i(this::class.java.simpleName, "Load QR!!!!!!!!")
+
+
+        if (res == "none" || res.isNullOrEmpty() || res.isBlank()) {
             val a = MigrationStub.axk()
-            val r = Others().x0x0(a)
-            res = r
-            sharedPref.savePref("r", r)
+            Log.i(this::class.java.simpleName, "valor de 'a' => $a")
+            res = a
+            sharedPref.savePref("r", res)
         }
+        Log.i(this::class.java.simpleName, "valor de 'res' => $res")
 
         return res
 

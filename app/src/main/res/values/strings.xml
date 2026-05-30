@@ -40,4 +40,7 @@
     <string name="description_btn_androidx">license_androidx</string>
     <string name="description_btn_markwon">license_markwon</string>
     <string name="description_btn_sqlcipher">license_sqlcipher</string>
+    <string name="general_error">Try restart the app, if the error still on, contact the developer by tutosriveorg@gmail.com.</string>
+    <string name="error_dialog_title">Something went wrong</string>
+    <string name="btn_dialog_close">Close</string>
 </resources>

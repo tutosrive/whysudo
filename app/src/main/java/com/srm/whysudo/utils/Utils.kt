@@ -58,7 +58,9 @@ object Utils {
     fun copyFileFromAssets(ctx: Context, filename: String, isDb: Boolean = false) {
         try {
             val outputFile: File = if (isDb) {
-                File("${ctx.dataDir}/databases/", filename)
+                val dbDir = File(ctx.dataDir, "databases")
+                dbDir.mkdirs()
+                File(dbDir, filename)
             } else {
                 File(ctx.filesDir, filename)
             }
@@ -73,6 +75,7 @@ object Utils {
                 }
             }
         } catch (e: Exception) {
+            throw e
         }
     }
 
@@ -130,11 +133,11 @@ object Utils {
 
     fun x(y: String, z: Int? = null): String {
         if (z != null && z in 1..2) {
-            return listOf<String>("user", "content")[if (z == 1) 0 else 1]
+            return listOf<String>("i", "5")[if (z == 1) 0 else 1]
         } else {
             if (z != null) {
                 if (z > 2) {
-                    return listOf<String>("638f54737aebeba59256b5abc62ac99a")[0]
+                    return listOf<String>("2")[0]
                 }
             }
         }

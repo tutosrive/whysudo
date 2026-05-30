@@ -34,11 +34,15 @@ import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.examples.MigrationStub
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.markdown.MarkdownManager
+import com.srm.whysudo.utils.BtnDialog
+import com.srm.whysudo.utils.ConfigDialog
+import com.srm.whysudo.utils.CustomDialog
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
@@ -87,7 +91,8 @@ class MainActivity : AppCompatActivity() {
         dbDataManager = DBDataManager(
             ctx = this,
             callbackOnStartLoad = { loadingStatus() },
-            callbackOnFinishLoad = { addListenerEvent() }
+            callbackOnFinishLoad = { addListenerEvent() },
+            callbackOnError = { showDefaultError() }
         )
         listCommands.onItemClickListener = handleListItemClick()
         btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
@@ -205,6 +210,25 @@ class MainActivity : AppCompatActivity() {
         val noteMsg = getString(R.string.default_command_note_header)
         val msg = "${initialMessage}\n---\n${noteMsg}\n---\n${command}"
         return msg
+    }
+
+    fun showDefaultError(): Unit {
+        val ctx = this
+        mainScope.launch {
+            val msg = getString(R.string.general_error)
+            val title = getString(R.string.error_dialog_title)
+            val exit = { exitProcess(0) }
+            val btnclose = BtnDialog(
+                getString(R.string.btn_dialog_close), exit
+            )
+            val config = ConfigDialog(
+                msg = msg,
+                title = title,
+                buttonClose = btnclose,
+                callbackOnDismiss = exit
+            )
+            CustomDialog(ctx, config)
+        }
     }
 
     fun goAbout(v: View): Unit {
