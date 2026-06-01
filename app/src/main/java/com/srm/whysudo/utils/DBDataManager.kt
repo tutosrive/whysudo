@@ -15,14 +15,11 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.examples.MigrationStub
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.zetetic.database.sqlcipher.SQLiteDatabase
@@ -51,7 +48,6 @@ class DBDataManager(
         try {
             val job = CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    Log.i("DBManager", "Empece trabajo 1")
                     callbackOnStartLoad?.invoke()
                     Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
                 } catch (e: Exception) {
@@ -60,14 +56,11 @@ class DBDataManager(
             }
 
             job.invokeOnCompletion {
-                Log.i("DBManager", "Terminé trabajo 1")
                 try {
                     val job2 = CoroutineScope(Dispatchers.IO).launch {
-                        Log.i("DBManager", "Empece trabajo 2")
                         dbMan = DbManager(fileDataName, ctx, qr)
                     }
                     job2.invokeOnCompletion {
-                        Log.i("DBManager", "Terminé trabajo 2")
                         db = dbMan.conn
                         callbackOnFinishLoad?.invoke()
                     }
@@ -78,7 +71,6 @@ class DBDataManager(
 
         } catch (e: Exception) {
             callbackOnError?.invoke()
-//            Toast.makeText(ctx, "Try Re-Open the aplication", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -179,24 +171,14 @@ class DBDataManager(
         dbMan.close()
     }
 
-    // Catch the possible error when loading db pass, and save it in the storage private APP
-    // This command just run one time for ever ...
-    // If any error have place here ... show a dialog and close the application
     private fun loadQr(): String {
         val sharedPref = SharedSettings(this.ctx)
         var res = sharedPref.getPref("r", "none")
-
-        Log.i(this::class.java.simpleName, "Load QR!!!!!!!!")
-
-
         if (res == "none" || res.isNullOrEmpty() || res.isBlank()) {
             val a = MigrationStub.axk()
-            Log.i(this::class.java.simpleName, "valor de 'a' => $a")
             res = a
             sharedPref.savePref("r", res)
         }
-        Log.i(this::class.java.simpleName, "valor de 'res' => $res")
-
         return res
 
     }
