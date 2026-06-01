@@ -13,21 +13,27 @@
  */
 
 package com.srm.whysudo
-
+// TODO: Add buttons and logic to load licenses
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
 import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.RawDataManager
 import com.srm.whysudo.utils.Utils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -36,7 +42,13 @@ class About : AppCompatActivity() {
     private lateinit var markmanAbout: MarkdownManager
     private lateinit var rawDatamanAbout: RawDataManager
     private lateinit var footerText: TextView
+    private lateinit var titleLicense: TextView
     private lateinit var appVersion: String
+    private lateinit var ctnAboutMain: LinearLayout
+    private lateinit var ctnLicense: LinearLayout
+    private lateinit var licenseView: TextView
+    private lateinit var btnGoBack: ImageButton
+    private var enableGoBack: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +59,7 @@ class About : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         appVersion = packageManager.getPackageInfo(packageName, 0).versionName.toString()
@@ -55,9 +68,25 @@ class About : AppCompatActivity() {
 
         infoText = findViewById<TextView>(R.id.infoText)
         footerText = findViewById<TextView>(R.id.footerAbout)
+        ctnAboutMain = findViewById<LinearLayout>(R.id.mainAboutCtn)
+        ctnLicense = findViewById<LinearLayout>(R.id.LCtnLicenses)
+        licenseView = findViewById<TextView>(R.id.licenseText)
+        titleLicense = findViewById<TextView>(R.id.titleLicense)
+        btnGoBack = findViewById<ImageButton>(R.id.btnGoBack)
 
         loadFooterInfo()
         loadInfoAbout()
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (enableGoBack) {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                } else {
+                    customBack()
+                }
+            }
+        })
     }
 
     private fun loadFooterInfo() {
@@ -96,6 +125,42 @@ class About : AppCompatActivity() {
         var updated: String = info
         if (info.contains("{version}")) updated = info.replace("{version}", appVersion)
         return updated
+    }
+
+    fun loadLicense(view: View) {
+        val ctx = this
+        CoroutineScope(Dispatchers.Main).launch {
+            val license = view.contentDescription.toString()
+            val content = Utils.readInternalFile(ctx, license)
+            showLicense(license, content)
+        }
+    }
+
+    private fun showLicense(license: String, content: String) {
+        toggleShowLicense(true)
+        titleLicense.text = Utils.snakeCaseToCapital(license)
+        licenseView.text = content
+    }
+
+    fun closeLicense(view: View) {
+        toggleShowLicense(false)
+    }
+
+    fun toggleShowLicense(isShowLicense: Boolean) {
+        this.enableGoBack = !isShowLicense
+        val mainVisibility = if (isShowLicense) View.GONE else View.VISIBLE
+        val licenseVisibility = if (isShowLicense) View.VISIBLE else View.GONE
+
+        Utils.setViewVisibility(ctnAboutMain, mainVisibility)
+        Utils.setViewVisibility(btnGoBack, mainVisibility)
+        Utils.setViewVisibility(ctnLicense, licenseVisibility)
+    }
+
+    private fun customBack() {
+        val visibleMain = ctnAboutMain.isGone
+        if (visibleMain) {
+            toggleShowLicense(false)
+        }
     }
 
     fun close(view: View) {

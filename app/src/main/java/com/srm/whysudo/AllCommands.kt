@@ -63,7 +63,6 @@ class AllCommands : AppCompatActivity() {
         )
 
         viewListCommands.onItemClickListener = loadCommand()
-//        loadCommandsData()
     }
 
     private fun loadDataIntoView(): Unit {
@@ -86,8 +85,8 @@ class AllCommands : AppCompatActivity() {
 
     private fun loadCommandsData(): Unit {
         mainScope.launch {
-//            dataOnStartLoad()
             allCommands = dbMan.getAllCommands()
+            // TODO: Decrease the initial load time (DB is loaded so fast ...)
             delay(300)
             dataOnFinishLoad()
         }

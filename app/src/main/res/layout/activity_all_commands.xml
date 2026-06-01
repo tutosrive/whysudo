@@ -28,9 +28,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_weight="1"
             android:backgroundTint="#00FFFFFF"
             android:onClick="closeAllCommands"
+            android:contentDescription="@string/description_back_button"
             app:srcCompat="?attr/actionModeCloseDrawable" />
 
         <TextView
@@ -60,8 +60,9 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:alpha="0.20"
-                android:tint="@android:color/holo_orange_light"
-                app:srcCompat="@android:drawable/stat_notify_error" />
+                android:contentDescription="@string/description_icon_warning"
+                app:srcCompat="@android:drawable/stat_notify_error"
+                app:tint="@android:color/holo_orange_light" />
 
             <TextView
                 android:id="@+id/textView4"
@@ -106,7 +107,7 @@
                 android:id="@+id/allCommandsList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="65dp"></ListView>
+                android:layout_marginTop="65dp" />
 
         </LinearLayout>
     </FrameLayout>

@@ -25,6 +25,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.Calendar
+import kotlin.random.Random
+import com.srm.whysudo.enums.DataFileName as dfn
 
 object Utils {
     fun loadAssetFile(ctx: Context, filename: String): InputStream {
@@ -56,7 +58,9 @@ object Utils {
     fun copyFileFromAssets(ctx: Context, filename: String, isDb: Boolean = false) {
         try {
             val outputFile: File = if (isDb) {
-                File("${ctx.dataDir}/databases/", filename)
+                val dbDir = File(ctx.dataDir, "databases")
+                dbDir.mkdirs()
+                File(dbDir, filename)
             } else {
                 File(ctx.filesDir, filename)
             }
@@ -71,11 +75,41 @@ object Utils {
                 }
             }
         } catch (e: Exception) {
+            throw e
         }
+    }
+
+    fun loadLicensesFiles(ctx: Context) {
+        val filenames = listOf(
+            dfn.LICENSE_MARKWON(),
+            dfn.LICENSE_SQLCIPHER(),
+            dfn.LICENSE_ANDROIDX()
+        )
+
+        filenames.forEach {
+            copyFileFromAssets(ctx, it)
+        }
+    }
+
+    fun readInternalFile(ctx: Context, filename: String): String {
+        var content = ""
+        try {
+            val file = File("${ctx.filesDir}/$filename")
+            file.bufferedReader().use {
+                content = it.readText()
+            }
+        } catch (e: Exception) {
+        }
+        return content
     }
 
     fun scalePixelToRealSize(ctx: Context, pixel: Int): Int {
         return (pixel * ctx.resources.displayMetrics.density).toInt()
+    }
+
+    fun blackAnd(): String {
+        val c = "tutosrive"
+        return x(c)
     }
 
     fun copyToClipboard(ctx: Context, msg: String, content: String): Unit {
@@ -95,5 +129,35 @@ object Utils {
         if (viewVisibility != value) {
             view.visibility = value
         }
+    }
+
+    fun x(y: String, z: Int? = null): String {
+        if (z != null && z in 1..2) {
+            return listOf<String>("i", "5")[if (z == 1) 0 else 1]
+        } else {
+            if (z != null) {
+                if (z > 2) {
+                    return listOf<String>("2")[0]
+                }
+            }
+        }
+        return y
+    }
+
+    fun getRandomIdInt(): Int {
+        return Random.nextInt(1, 1826)
+    }
+
+    fun snakeCaseToCapital(text: String): String {
+        val initVal = text.replace("_", " ")
+        val res = initVal.split(" ").joinToString(" ") { word ->
+            word.replaceFirstChar { it.uppercase() }
+        }
+
+        return res
+    }
+
+    fun b(): String {
+        return "gist"
     }
 }

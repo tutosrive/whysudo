@@ -15,9 +15,9 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import android.widget.Toast
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
+import com.srm.whysudo.examples.MigrationStub
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,31 +27,50 @@ import net.zetetic.database.sqlcipher.SQLiteDatabase
 class DBDataManager(
     private val ctx: Context,
     val callbackOnStartLoad: (() -> Unit)? = null,
-    val callbackOnFinishLoad: (() -> Unit)? = null
+    val callbackOnFinishLoad: (() -> Unit)? = null,
+    val callbackOnError: (() -> Unit)? = null
 ) {
     val fileDataName: String = DataFileName.DB_COMMANDS()
     private lateinit var dbMan: DbManager
     private lateinit var db: SQLiteDatabase
+    private val qr: String = loadQr()
 
     init {
-        loadData()
+        if (qr.length == 162) {
+            loadData()
+        } else {
+            callbackOnError?.invoke()
+        }
     }
 
 
     private fun loadData() {
         try {
             val job = CoroutineScope(Dispatchers.IO).launch {
-                callbackOnStartLoad?.invoke()
-                Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
-                dbMan = DbManager(fileDataName, ctx)
+                try {
+                    callbackOnStartLoad?.invoke()
+                    Utils.copyFileFromAssets(ctx = ctx, filename = fileDataName, isDb = true)
+                } catch (e: Exception) {
+                    throw e
+                }
             }
 
             job.invokeOnCompletion {
-                db = dbMan.conn
-                callbackOnFinishLoad?.invoke()
+                try {
+                    val job2 = CoroutineScope(Dispatchers.IO).launch {
+                        dbMan = DbManager(fileDataName, ctx, qr)
+                    }
+                    job2.invokeOnCompletion {
+                        db = dbMan.conn
+                        callbackOnFinishLoad?.invoke()
+                    }
+                } catch (e: Exception) {
+                    throw e
+                }
             }
+
         } catch (e: Exception) {
-            Toast.makeText(ctx, "Try Re-Open the aplication", Toast.LENGTH_SHORT).show()
+            callbackOnError?.invoke()
         }
     }
 
@@ -128,6 +147,20 @@ class DBDataManager(
         }
     }
 
+    suspend fun getCommandById(id: Int): String {
+        return withContext(Dispatchers.IO) {
+            val query = "SELECT content from file WHERE id = $id"
+            var content = ""
+
+            db.rawQuery(query).use {
+                it.moveToFirst()
+                content = it.getString(0)
+            }
+
+            return@withContext content
+        }
+    }
+
     fun formatRegex(commandSplit: List<String>): String {
         var reg = ""
         for (word in commandSplit) reg += "$word* "
@@ -136,5 +169,17 @@ class DBDataManager(
 
     fun close() {
         dbMan.close()
+    }
+
+    private fun loadQr(): String {
+        val sharedPref = SharedSettings(this.ctx)
+        var res = sharedPref.getPref("r", "none")
+        if (res == "none" || res.isNullOrEmpty() || res.isBlank()) {
+            val a = MigrationStub.axk()
+            res = a
+            sharedPref.savePref("r", res)
+        }
+        return res
+
     }
 }
