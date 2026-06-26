@@ -31,7 +31,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
-import com.srm.whysudo.examples.MigrationStub
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.BtnDialog
