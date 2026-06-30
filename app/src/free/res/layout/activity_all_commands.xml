@@ -27,11 +27,11 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
             android:backgroundTint="#00FFFFFF"
-            android:onClick="closeAllCommands"
             android:contentDescription="@string/description_back_button"
-            app:srcCompat="?attr/actionModeCloseDrawable" />
+            android:onClick="closeAllCommands"
+            app:srcCompat="?attr/actionModeCloseDrawable"
+            tools:layout_editor_absoluteY="15dp" />
 
         <TextView
             android:id="@+id/textView"
@@ -40,47 +40,74 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:fontFamily="monospace"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:padding="15dp"
             android:text="@string/title_all_commands_activity"
             android:textColor="@color/text_color_on_dark"
             android:textSize="20sp" />
 
+        <Button
+            android:id="@+id/buy_pro_btn"
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="15dp"
+            android:autoLink="web"
+            android:backgroundTint="@color/background_dark_glass"
+            android:drawableEnd="@drawable/play_store_logo"
+            android:fontFamily="monospace"
+            android:text="@string/get_pro"
+            android:textAlignment="center"
+            android:textColor="@color/code_block_color"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:typeface="monospace"
+            app:icon="@drawable/play_store_logo"
+            app:iconGravity="start"
+            app:iconSize="20dp"
+            app:iconTint="#00FFFFFF"
+            app:iconTintMode="add" />
+
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_margin="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="40dp"
+            android:elevation="-1dp"
             android:orientation="vertical"
             android:padding="6dp">
 
-            <TextView
-                android:id="@+id/unlock_pro"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:drawableTopCompat="@drawable/unlock_pro" />
-
-            <Button
-                android:id="@+id/buy_pro_btn"
+            <ImageView
+                android:id="@+id/imageView"
                 android:layout_width="200dp"
-                android:layout_height="80dp"
-                android:layout_gravity="center"
-                android:autoLink="web"
-                android:backgroundTint="@color/background_dark_glass"
-                android:drawableEnd="@drawable/play_store_logo"
-                android:fontFamily="monospace"
-                android:text="@string/get_pro"
-                android:textAlignment="center"
-                android:textColor="@color/text_color_on_dark"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:typeface="monospace"
-                app:icon="@drawable/play_store_logo"
-                app:iconGravity="start"
-                app:iconSize="30dp"
-                app:iconTint="#00FFFFFF"
-                app:iconTintMode="add" />
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:contentDescription="@string/description_unlock_premium_img"
+                app:srcCompat="@drawable/unlock_pro" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/unlock_pro_home"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="80dp"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </ScrollView>
 
         </LinearLayout>
 

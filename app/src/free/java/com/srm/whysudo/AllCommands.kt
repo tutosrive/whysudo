@@ -15,7 +15,6 @@
 package com.srm.whysudo
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -47,20 +46,24 @@ class AllCommands : AppCompatActivity() {
         }
         markManAll = MarkdownManager(this)
         btnBuyPro = findViewById<Button>(R.id.buy_pro_btn)
-        unlockPro = findViewById<TextView>(R.id.unlock_pro)
+        unlockPro = findViewById<TextView>(R.id.unlock_pro_home)
         this.btnBuyPro.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=com.whatsapp".toUri())
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/details?id=com.whatsapp".toUri()
+            )
             startActivity(intent)
         }
         this.setText()
     }
 
-    fun setText(){
+    fun setText() {
         mainScope.launch {
             val textUnlock: String = getString(R.string.unlock_pro_msg)
             markManAll.setMark(textUnlock, unlockPro)
         }
     }
+
     fun closeAllCommands(v: View): Unit {
         finish()
     }

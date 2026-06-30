@@ -5,10 +5,10 @@
  * GitHub: https://github.com/tutosrive
  *
  * This source code is PROPRIETARY and CONFIDENTIAL.
- * Unauthorized copying, modification, or distribution of this file, 
- * via any medium, is strictly prohibited. 
+ * Unauthorized copying, modification, or distribution of this file,
+ * via any medium, is strictly prohibited.
  *
- * This software is provided "as is", without warranty of any kind. 
+ * This software is provided "as is", without warranty of any kind.
  * In no event shall the author be liable for any claim or damages.
  */
 
@@ -31,11 +31,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
-import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.BtnDialog
 import com.srm.whysudo.utils.ConfigDialog
 import com.srm.whysudo.utils.CustomDialog
+import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

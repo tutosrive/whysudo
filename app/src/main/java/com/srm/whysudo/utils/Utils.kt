@@ -25,6 +25,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.Calendar
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.random.Random
 import com.srm.whysudo.enums.DataFileName as dfn
 
@@ -142,6 +144,12 @@ object Utils {
             }
         }
         return y
+    }
+
+    fun getRandomIdIntNine(): Int {
+        val min: Int = ceil(9 / 9.0).toInt()
+        val max: Int = floor(1625 / 9.0).toInt()
+        return Random.nextInt(min, max) * 9
     }
 
     fun getRandomIdInt(): Int {
