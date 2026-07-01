@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 tutosrive. All rights reserved.
+  ~
+  ~ Author: tutosrive
+  ~ GitHub: https://github.com/tutosrive
+  ~
+  ~ This source code is PROPRIETARY and CONFIDENTIAL.
+  ~ Unauthorized copying, modification, or distribution of this file,
+  ~ via any medium, is strictly prohibited.
+  ~
+  ~ This software is provided "as is", without warranty of any kind.
+  ~ In no event shall the author be liable for any claim or damages.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/stacked_waves_haikei_pruple"
+    android:orientation="vertical"
+    tools:context=".About">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/footerAbout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:textColor="@color/on_surface"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/mainAboutCtn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:onClick="ctaClick"
+                    android:text="@string/about_page_title"
+                    android:textColor="@color/text_color_on_dark"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/description_logo_image"
+                app:srcCompat="@mipmap/ic_launcher_foreground" />
+
+            <Button
+                android:id="@+id/buy_pro_btn_about"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="15dp"
+                android:autoLink="web"
+                android:backgroundTint="@color/background_dark_glass"
+                android:drawableEnd="@drawable/play_store_logo"
+                android:fontFamily="monospace"
+                android:text="@string/get_pro"
+                android:textAlignment="center"
+                android:textColor="@color/code_block_color"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:typeface="monospace"
+                app:icon="@drawable/play_store_logo"
+                app:iconGravity="start"
+                app:iconSize="20dp"
+                app:iconTint="#00FFFFFF"
+                app:iconTintMode="add" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="40dp">
+
+                    <TextView
+                        android:id="@+id/infoText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:singleLine="false"
+                        android:textColor="@color/text_color_on_dark" />
+
+                    <Button
+                        android:id="@+id/btn_license_markwon"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/background_dark_glass"
+                        android:contentDescription="@string/description_btn_markwon"
+                        android:drawablePadding="0dp"
+                        android:onClick="loadLicense"
+                        android:text="@string/btn_license_markwon"
+                        android:textColor="@color/on_surface"
+                        app:icon="@drawable/osl"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="#4BB43F" />
+
+                    <Button
+                        android:id="@+id/btn_license_sqlcipher"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/background_dark_glass"
+                        android:contentDescription="@string/description_btn_sqlcipher"
+                        android:drawablePadding="0dp"
+                        android:onClick="loadLicense"
+                        android:text="@string/btn_license_sqlcipher"
+                        android:textColor="@color/on_surface"
+                        app:icon="@drawable/osl"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="#4BB43F" />
+
+                    <Button
+                        android:id="@+id/btn_license_androidx"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/background_dark_glass"
+                        android:contentDescription="@string/description_btn_androidx"
+                        android:drawablePadding="0dp"
+                        android:onClick="loadLicense"
+                        android:text="@string/btn_license_androidx"
+                        android:textColor="@color/on_surface"
+                        app:icon="@drawable/osl"
+                        app:iconPadding="0dp"
+                        app:iconSize="28dp"
+                        app:iconTint="#4BB43F" />
+
+                </LinearLayout>
+            </ScrollView>
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnGoBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="?attr/actionModeCloseContentDescription"
+            android:onClick="close"
+            app:srcCompat="?attr/actionModeCloseDrawable" />
+
+        <LinearLayout
+            android:id="@+id/LCtnLicenses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/rounded_background"
+            android:backgroundTint="@color/background_dark_glass"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/titleLicense"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_horizontal"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="600dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/licenseText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </ScrollView>
+
+            <ImageButton
+                android:id="@+id/closeLicense"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="20dp"
+                android:background="#00FFFFFF"
+                android:contentDescription="@string/description_back_button"
+                android:onClick="closeLicense"
+                app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

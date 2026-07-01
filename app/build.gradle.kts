@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-val versionApp = "0.2.8"
+val versionApp = "0.2.9"
 
 base {
     archivesName.set("WhySudo-v$versionApp")
@@ -77,6 +77,17 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    flavorDimensions += listOf("version")
+    productFlavors {
+        create("free") {
+            dimension = "version"
+            applicationIdSuffix = ".free"
+        }
+        create("pro") {
+            dimension = "version"
+            applicationIdSuffix = ".pro"
+        }
+    }
 }
 
 dependencies {
@@ -94,6 +105,4 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite
     implementation("androidx.sqlite:sqlite:2.6.2")
     implementation("net.zetetic:sqlcipher-android:4.14.0@aar")
-    // Source: https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-    implementation("com.squareup.okhttp3:okhttp:5.3.2")
 }

@@ -14,12 +14,15 @@
 
 package com.srm.whysudo.utils
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.srm.whysudo.markdown.MarkdownManager
 import java.io.File
 import java.io.FileOutputStream
@@ -144,6 +147,30 @@ object Utils {
         return y
     }
 
+    fun getRandomIndexFree(): Int {
+        val indexes: List<Int> = listOf(
+            32, 35, 37, 40, 42, 43, 48, 49, 50, 51, 76, 79, 80, 81, 83, 85, 86, 91, 96,
+            102, 103, 104, 109, 111, 114, 123, 125, 126, 146, 147, 163, 165, 167, 171, 175,
+            179, 182, 185, 201, 203, 204, 206, 217, 221, 223, 225, 228, 230, 233, 238, 240,
+            242, 243, 251, 255, 256, 257, 260, 269, 270, 271, 275, 276, 277, 284, 289, 293,
+            295, 299, 302, 303, 312, 314, 318, 331, 333, 334, 335, 338, 348, 349, 351, 352,
+            353, 367, 376, 377, 378, 385, 386, 391, 393, 398, 400, 409, 415, 418, 421, 433,
+            436, 437, 444, 446, 458, 467, 471, 475, 476, 477, 479, 487, 488, 489, 500, 502,
+            504, 506, 509, 515, 516, 517, 518, 521, 525, 526, 527, 528, 529, 530, 531, 532,
+            535, 542, 658, 659, 660, 665, 666, 675, 676, 681, 685, 687, 689, 693, 694, 695,
+            700, 705, 706, 708, 714, 725, 729, 730, 742, 743, 745, 749, 750, 751, 767, 770,
+            772, 773, 775, 778, 787, 788, 789, 793, 794, 810, 807, 850, 851, 882, 883, 885,
+            886, 887, 888, 890, 892, 893, 895, 900, 901, 902, 903, 906, 907, 908, 909, 910,
+            911, 912, 913, 914, 915
+        )
+        return indexes.random()
+    }
+
+    fun intToBoolean(int: Int): Boolean {
+        val bool = int != 0
+        return bool
+    }
+
     fun getRandomIdInt(): Int {
         return Random.nextInt(1, 1826)
     }
@@ -159,5 +186,11 @@ object Utils {
 
     fun b(): String {
         return "gist"
+    }
+
+    fun Activity.hideKeyboard() {
+        WindowInsetsControllerCompat(window, window.decorView).hide(
+            WindowInsetsCompat.Type.ime()
+        )
     }
 }

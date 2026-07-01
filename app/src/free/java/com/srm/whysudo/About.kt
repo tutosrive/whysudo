@@ -13,16 +13,19 @@
  */
 
 package com.srm.whysudo
-// TODO: Add buttons and logic to load licenses
+
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
@@ -48,6 +51,7 @@ class About : AppCompatActivity() {
     private lateinit var ctnLicense: LinearLayout
     private lateinit var licenseView: TextView
     private lateinit var btnGoBack: ImageButton
+    private lateinit var btnUnlockPro: Button
     private var enableGoBack: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +77,7 @@ class About : AppCompatActivity() {
         licenseView = findViewById<TextView>(R.id.licenseText)
         titleLicense = findViewById<TextView>(R.id.titleLicense)
         btnGoBack = findViewById<ImageButton>(R.id.btnGoBack)
+        btnUnlockPro = findViewById<Button>(R.id.buy_pro_btn_about)
 
         loadFooterInfo()
         loadInfoAbout()
@@ -87,6 +92,13 @@ class About : AppCompatActivity() {
                 }
             }
         })
+        btnUnlockPro.setOnClickListener {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                "https://my.play/tutosrive".toUri()
+            )
+            startActivity(intent)
+        }
     }
 
     private fun loadFooterInfo() {

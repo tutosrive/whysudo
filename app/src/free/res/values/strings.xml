@@ -1,0 +1,23 @@
+<!--
+  ~ Copyright (c) 2026 tutosrive. All rights reserved.
+  ~
+  ~ Author: tutosrive
+  ~ GitHub: https://github.com/tutosrive
+  ~
+  ~ This source code is PROPRIETARY and CONFIDENTIAL.
+  ~ Unauthorized copying, modification, or distribution of this file,
+  ~ via any medium, is strictly prohibited.
+  ~
+  ~ This software is provided "as is", without warranty of any kind.
+  ~ In no event shall the author be liable for any claim or damages.
+  -->
+
+<resources>
+    <string name="app_name">Why Sudo? - Free</string>
+    <string name="footer_message">© YEAR - tutosrive - free version</string>
+    <string name="property_functionality">This feature and its associated commands</string>
+    <string name="property_command">## {thiscommand}\n\nThe command \'{thiscommand}\' and `1,720+` more</string>
+    <string name="unlock_pro_msg_command">{property} are reserved for `Why Sudo PRO` users.\n\nMaster your Linux environment with a tool built for performance and precision. The PRO version delivers a complete, uncompromised _offline_ database tailored for power users, ensuring you have the right tool at the right time. Your PRO upgrade provides:\n\n- Complete Repository: Full _offline_ availability of all `1,720+` native Linux commands.\n- Workflow Integration: Rapid 1-Tap copying for complex shell configurations.\n- Session Memory: Integrated Search History and Bookmarks for immediate reference.\n- Full Directory Access: _Unlocks_ the unrestricted catalog browser.\n- Visual Customization: Professional themes to adjust the interface accent colors.\n\nUpgrade to the full version and support optimized, native development.</string>
+    <string name="get_pro">Get PRO version</string>
+    <string name="description_unlock_premium_img">Image descripting Get Pro</string>
+</resources>

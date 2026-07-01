@@ -43,4 +43,5 @@
     <string name="general_error">Try restart the app, if the error still on, contact the developer by tutosriveorg@gmail.com.</string>
     <string name="error_dialog_title">Something went wrong</string>
     <string name="btn_dialog_close">Close</string>
+    <string name="description_badge_command_pro_free">Badge image to show PRO or FREE</string>
 </resources>
