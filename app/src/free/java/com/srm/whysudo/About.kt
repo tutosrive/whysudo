@@ -95,7 +95,7 @@ class About : AppCompatActivity() {
         btnUnlockPro.setOnClickListener {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                "https://play.google.com/store/apps/details?id=com.whatsapp".toUri()
+                "https://my.play/tutosrive".toUri()
             )
             startActivity(intent)
         }
