@@ -19,27 +19,27 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
+import com.srm.whysudo.adapters.CommandModelView
+import com.srm.whysudo.adapters.CustomListAdapter
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.BtnDialog
 import com.srm.whysudo.utils.ConfigDialog
 import com.srm.whysudo.utils.CustomDialog
 import com.srm.whysudo.utils.Utils
+import com.srm.whysudo.utils.Utils.hideKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var footerTxt: TextView
     private lateinit var unlockProTextView: TextView
     private lateinit var listCommands: ListView
-    private lateinit var commandsListValues: List<String>
+    private lateinit var commandsListValues: List<CommandModelView>
     private lateinit var btnSeeAllCommands: ImageButton
     private lateinit var btnUnlockPro: Button
     private lateinit var layUnlockPro: LinearLayout
@@ -107,10 +107,11 @@ class MainActivity : AppCompatActivity() {
         return AdapterView.OnItemClickListener { _, _, pos, _ ->
             mainScope.launch {
                 val commandSelected = commandsListValues[pos]
+                hideKeyboard()
                 if (isPro(commandSelected)) {
                     showUnlockPro(commandSelected)
                 } else {
-                    showCommandContent(commandSelected)
+                    showCommandContent(commandSelected.filename)
                 }
             }
         }
@@ -142,7 +143,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeRealTimeText(text: CharSequence?, before: Int, count: Int) {
-        var fileNames: List<String>? = null
+        var fileNames: List<CommandModelView>? = null
         val command: String = (text ?: "").trim().toString()
         when {
             !command.isEmpty() -> mainScope.launch {
@@ -158,8 +159,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun getCommandData(command: String): List<String>? {
-        var data: List<String>? = null
+    private suspend fun getCommandData(command: String): List<CommandModelView>? {
+        var data: List<CommandModelView>? = null
         try {
             data = dbDataManager.getFileNames(command)
         } catch (e: Exception) {
@@ -168,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         return data
     }
 
-    private suspend fun showCommandOrList(filenames: List<String>?): Unit {
+    private suspend fun showCommandOrList(filenames: List<CommandModelView>?): Unit {
         if (filenames == null) {
             showDefaultCommandHint()
             return
@@ -180,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                     if (isPro(filenames[0])) {
                         showUnlockPro(filenames[0])
                     } else {
-                        showCommandContent(filenames[0])
+                        showCommandContent(filenames[0].filename)
                     }
                 }
 
@@ -198,14 +199,13 @@ class MainActivity : AppCompatActivity() {
         markman.setMark(content, commandInfoText)
     }
 
-    private suspend fun showCommandList(list: List<String>): Unit {
+    private suspend fun showCommandList(list: List<CommandModelView>): Unit {
         commandsListValues = list
         Utils.setViewVisibility(ctnInfoText, View.GONE)
         Utils.setViewVisibility(listCommands, View.VISIBLE)
 
-        val elements: ArrayAdapter<String> = ArrayAdapter(
+        val elements: CustomListAdapter = CustomListAdapter(
             this,
-            android.R.layout.simple_list_item_1,
             list
         )
 
@@ -248,10 +248,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showUnlockPro(command: String): Unit {
+    fun showUnlockPro(command: CommandModelView): Unit {
+        Utils.setViewVisibility(listCommands, View.GONE)
+        Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         toggleUnlockPro(true)
+        val propertyCommand = getString(R.string.property_command)
         val unlockText: String = getString(R.string.unlock_pro_msg_command)
-            .replace("{thiscommand}", command)
+            .replace("{property}", propertyCommand)
+            .replace("{thiscommand}", command.filename)
         markman.setMark(unlockText, unlockProTextView)
     }
 
@@ -263,8 +267,8 @@ class MainActivity : AppCompatActivity() {
         Utils.setViewVisibility(commandInfoText, gone)
     }
 
-    fun isPro(command: String): Boolean {
-        return command.contains(" - PRO")
+    fun isPro(command: CommandModelView): Boolean {
+        return command.typeVersion
     }
 
     fun goAbout(v: View): Unit {

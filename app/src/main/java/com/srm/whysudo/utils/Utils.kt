@@ -14,12 +14,15 @@
 
 package com.srm.whysudo.utils
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.srm.whysudo.markdown.MarkdownManager
 import java.io.File
 import java.io.FileOutputStream
@@ -163,6 +166,11 @@ object Utils {
         return indexes.random()
     }
 
+    fun intToBoolean(int: Int): Boolean {
+        val bool = int != 0
+        return bool
+    }
+
     fun getRandomIdInt(): Int {
         return Random.nextInt(1, 1826)
     }
@@ -178,5 +186,11 @@ object Utils {
 
     fun b(): String {
         return "gist"
+    }
+
+    fun Activity.hideKeyboard() {
+        WindowInsetsControllerCompat(window, window.decorView).hide(
+            WindowInsetsCompat.Type.ime()
+        )
     }
 }

@@ -59,7 +59,9 @@ class AllCommands : AppCompatActivity() {
 
     fun setText() {
         mainScope.launch {
-            val textUnlock: String = getString(R.string.unlock_pro_msg)
+            val propertyCommand = getString(R.string.property_functionality)
+            val textUnlock: String = getString(R.string.unlock_pro_msg_command)
+                .replace("{property}", propertyCommand)
             markManAll.setMark(textUnlock, unlockPro)
         }
     }
