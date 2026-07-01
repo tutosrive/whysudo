@@ -75,18 +75,26 @@ class DBDataManager(
     }
 
     @Throws(Exception::class)
-    suspend fun getFileNames(command: String, limit: Int? = 40): List<String> {
+    suspend fun getFileNames(command: String, limit: Int? = 40, lang: String = "en"): List<String> {
         return withContext(Dispatchers.IO) {
             val fileNames: MutableList<String> = mutableListOf<String>()
             val cmdSplit: List<String> = command.split("\\s+".toRegex())
             val cmd = cmdSplit.joinToString(separator = "-")
+//            val query =
+//                """SELECT filename FROM file WHERE filename = '$cmd'
+//                    OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
+//                    formatRegex(cmdSplit)
+//                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
+//                LIMIT $limit"""
             val query =
-                """SELECT filename FROM file WHERE filename = '$cmd'
-                    OR id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH 'content:${
+                """SELECT concat(filename, ' - ', suffix) filename FROM file F
+                    INNER JOIN version V ON F.type_version = V.id
+                    WHERE filename = ?
+                    OR F.id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH '$lang:${
                     formatRegex(cmdSplit)
-                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = '$cmd')
+                }') AND NOT EXISTS ( SELECT 1 FROM file WHERE filename = ?)
                 LIMIT $limit"""
-            db.rawQuery(query).use {
+            db.rawQuery(query, arrayOf(cmd)).use {
                 while (it.moveToNext()) {
                     fileNames.add(it.getString(0))
                 }
@@ -120,11 +128,15 @@ class DBDataManager(
     }
 
     @Throws(Exception::class)
-    suspend fun getCommandContent(command: String): String {
+    suspend fun getCommandContent(command: String, lang: String = "en"): String {
+        val cmd = command.replace(" - FREE", "")
+        println(cmd)
         return withContext(Dispatchers.IO) {
             var content: String
-            val query = "SELECT content FROM file WHERE filename = '$command'"
-            db.rawQuery(query).use {
+//            val query = "SELECT content FROM file WHERE filename = '$command'"
+            val query = """SELECT $lang FROM content_language C
+                inner join file F on C.id = F.id_data WHERE filename = ?"""
+            db.rawQuery(query, arrayOf(cmd)).use {
                 it.moveToFirst()
                 content = it.getString(0)
                 it.close()
@@ -136,7 +148,8 @@ class DBDataManager(
     suspend fun getAllCommands(): List<String> {
         return withContext(Dispatchers.IO) {
             val filenames: MutableList<String> = mutableListOf()
-            val query = "SELECT filename FROM file"
+            val query = """SELECT concat(filename, ' - ', suffix) filename FROM file F
+                    INNER JOIN version V ON F.type_version = V.id"""
             db.rawQuery(query).use {
                 while (it.moveToNext()) {
                     filenames.add(it.getString(0))
@@ -147,12 +160,13 @@ class DBDataManager(
         }
     }
 
-    suspend fun getCommandById(id: Int): String {
+    suspend fun getCommandById(id: Int, lang: String = "en"): String {
         return withContext(Dispatchers.IO) {
-            val query = "SELECT content from file WHERE id = $id"
+//            val query = "SELECT $lang from file WHERE id = $id"
+            val query = """SELECT $lang FROM content_language C
+                inner join file F on C.id = F.id_data WHERE C.id = ?"""
             var content = ""
-
-            db.rawQuery(query).use {
+            db.rawQuery(query, arrayOf(id.toString())).use {
                 it.moveToFirst()
                 content = it.getString(0)
             }

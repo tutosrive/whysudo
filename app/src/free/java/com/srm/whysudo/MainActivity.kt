@@ -59,17 +59,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnSeeAllCommands: ImageButton
     private lateinit var btnUnlockPro: Button
     private lateinit var layUnlockPro: LinearLayout
-    private val waitResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val command = data?.getStringExtra("command")
-            lifecycleScope.launch {
-                showCommandContent("$command")
-            }
-        }
-    }
 
     val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -105,11 +94,10 @@ class MainActivity : AppCompatActivity() {
         listCommands.onItemClickListener = handleListItemClick()
         btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
         Utils.loadLicensesFiles(this)
-        showUnlockPro("testing this")
         btnUnlockPro.setOnClickListener {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                "https://play.google.com/store/apps/details?id=com.whatsapp".toUri()
+                "https://my.play/tutosrive".toUri()
             )
             startActivity(intent)
         }
@@ -188,7 +176,14 @@ class MainActivity : AppCompatActivity() {
 
         filenames.size.let {
             when (it) {
-                1 -> showCommandContent(filenames[0])
+                1 -> {
+                    if (isPro(filenames[0])) {
+                        showUnlockPro(filenames[0])
+                    } else {
+                        showCommandContent(filenames[0])
+                    }
+                }
+
                 in 2..it -> showCommandList(filenames)
                 else -> showDefaultCommandHint()
             }
@@ -197,7 +192,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun showCommandContent(name: String): Unit {
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
-//        Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
+        Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         toggleUnlockPro(false)
         val content = dbDataManager.getCommandContent(name)
         markman.setMark(content, commandInfoText)
@@ -218,16 +213,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun showDefaultCommandHint(): Unit {
-//        Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
+        Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
-//        toggleUnlockPro(false)
-//        val placeholderDefault = getString(R.string.hint_main_info_command)
-//        val msg = showRandomCommand(placeholderDefault)
-//        markman.setMark(msg, commandInfoText)
+        toggleUnlockPro(false)
+        val placeholderDefault = getString(R.string.hint_main_info_command)
+        val msg = showRandomCommand(placeholderDefault)
+        markman.setMark(msg, commandInfoText)
     }
 
     private suspend fun showRandomCommand(initialMessage: String): String {
-        val id = Utils.getRandomIdIntNine()
+        val id = Utils.getRandomIndexFree()
         val command = dbDataManager.getCommandById(id)
         val noteMsg = getString(R.string.default_command_note_header)
         val msg = "${initialMessage}\n---\n${noteMsg}\n---\n${command}"
@@ -254,10 +249,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showUnlockPro(command: String): Unit {
-//        Utils.setViewVisibility(btnUnlockPro, View.VISIBLE)
-//        Utils.setViewVisibility(layUnlockPro, View.VISIBLE)
-//        Utils.setViewVisibility(ctnInfoText, View.GONE)
-//        Utils.setViewVisibility(unlockProTextView, View.VISIBLE)
         toggleUnlockPro(true)
         val unlockText: String = getString(R.string.unlock_pro_msg_command)
             .replace("{thiscommand}", command)
@@ -269,7 +260,7 @@ class MainActivity : AppCompatActivity() {
         val gone: Int = if (show) View.GONE else View.VISIBLE
         Utils.setViewVisibility(btnUnlockPro, visible)
         Utils.setViewVisibility(layUnlockPro, visible)
-        Utils.setViewVisibility(ctnInfoText, gone)
+        Utils.setViewVisibility(commandInfoText, gone)
     }
 
     fun isPro(command: String): Boolean {
@@ -281,8 +272,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goAllCommands(v: View): Unit {
-        val intent = Intent(this, AllCommands::class.java)
-        waitResult.launch(intent)
+        Utils.goToAnActivity(this, v, AllCommands::class.java)
     }
 
     override fun onDestroy() {
