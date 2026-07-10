@@ -19,8 +19,8 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.text.method.ScrollingMovementMethod
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
+import com.srm.whysudo.BuildConfig
 import com.srm.whysudo.MainActivity
 import com.srm.whysudo.R
 import com.srm.whysudo.utils.Utils
@@ -33,6 +33,7 @@ import org.commonmark.node.FencedCodeBlock
 
 class MarkdownManager(val ctx: Context) {
     var mark: Markwon
+//    var adapterList
 
     init {
 
@@ -53,14 +54,6 @@ class MarkdownManager(val ctx: Context) {
                             codeStyles(builder)
                             listStyles(builder)
                         }
-                    }
-                }
-
-                override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
-                    builder.appendFactory(FencedCodeBlock::class.java) { _, _ ->
-                        val iconCopy: Drawable =
-                            AppCompatResources.getDrawable(ctx, R.drawable.shell_text)!!
-                        CopyIconSpan(iconCopy)
                     }
                 }
             })
@@ -88,14 +81,5 @@ class MarkdownManager(val ctx: Context) {
     private fun listStyles(b: MarkwonTheme.Builder) {
         val bulletWidth: Int = Utils.scalePixelToRealSize(ctx, 4)
         b.bulletWidth(bulletWidth)
-    }
-
-    fun copyToClipboard(content: String): Unit {
-        Utils.copyToClipboard(ctx, "Command", content)
-        Toast.makeText(
-            ctx,
-            R.string.copy_clipboard_successfully,
-            Toast.LENGTH_LONG
-        ).show()
     }
 }

@@ -25,6 +25,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.srm.whysudo.adapters.CommandModelView
+import com.srm.whysudo.adapters.CustomListAdapter
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AllCommands : AppCompatActivity() {
-    private lateinit var allCommands: List<String>
+    private lateinit var allCommands: List<CommandModelView>
     private lateinit var dbMan: DBDataManager
     private lateinit var loadingL: LinearLayout
     private lateinit var errorL: LinearLayout
@@ -95,7 +97,7 @@ class AllCommands : AppCompatActivity() {
     private fun loadCommand(): AdapterView.OnItemClickListener {
         return AdapterView.OnItemClickListener { _, _, pos, _ ->
             mainScope.launch {
-                val commandSelected = allCommands[pos]
+                val commandSelected = allCommands[pos].filename
                 val result = Intent()
                 result.putExtra("command", commandSelected)
 
@@ -110,9 +112,8 @@ class AllCommands : AppCompatActivity() {
         Utils.setViewVisibility(errorL, View.GONE)
         Utils.setViewVisibility(layoutAllCommands, View.VISIBLE)
 
-        val elements: ArrayAdapter<String> = ArrayAdapter(
+        val elements: CustomListAdapter = CustomListAdapter(
             this,
-            android.R.layout.simple_list_item_1,
             allCommands
         )
 

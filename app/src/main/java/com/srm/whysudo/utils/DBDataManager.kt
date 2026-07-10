@@ -154,14 +154,15 @@ class DBDataManager(
     }
 
     // TODO: Fix old format List to new Format (CommandModelView) and manage with CustomListAdapter on PRO
-    suspend fun getAllCommands(): List<String> {
+    suspend fun getAllCommands(): List<CommandModelView> {
         return withContext(Dispatchers.IO) {
-            val filenames: MutableList<String> = mutableListOf()
-            val query = """SELECT concat(filename, ' - ', suffix) filename FROM file F
+            val filenames: MutableList<CommandModelView> = mutableListOf()
+            val query = """SELECT filename, is_pro FROM file F
                     INNER JOIN version V ON F.type_version = V.id"""
             db.rawQuery(query).use {
                 while (it.moveToNext()) {
-                    filenames.add(it.getString(0))
+                    val command: CommandModelView = makeCommandObj(it)
+                    filenames.add(command)
                 }
                 it.close()
             }

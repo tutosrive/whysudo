@@ -25,7 +25,7 @@ base {
 android {
     namespace = "com.srm.whysudo"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -76,6 +76,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     flavorDimensions += listOf("version")
     productFlavors {
@@ -93,6 +94,7 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.recyclerview)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
@@ -101,8 +103,12 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation("io.noties.markwon:core:4.6.2")
     // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite
     implementation("androidx.sqlite:sqlite:2.6.2")
     implementation("net.zetetic:sqlcipher-android:4.14.0@aar")
+
+    // Source: https://mvnrepository.com/artifact/io.noties.markwon/core
+    implementation("io.noties.markwon:core:4.6.2")
+    // Source: https://mvnrepository.com/artifact/io.noties.markwon/recycler
+    implementation("io.noties.markwon:recycler:4.6.2")
 }

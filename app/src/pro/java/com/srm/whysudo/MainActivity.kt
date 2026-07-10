@@ -19,7 +19,6 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
@@ -31,6 +30,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
+import com.srm.whysudo.adapters.CommandModelView
+import com.srm.whysudo.adapters.CustomListAdapter
 import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.BtnDialog
 import com.srm.whysudo.utils.ConfigDialog
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
     private lateinit var listCommands: ListView
-    private lateinit var commandsListValues: List<String>
+    private lateinit var commandsListValues: List<CommandModelView>
     private lateinit var btnSeeAllCommands: ImageButton
     private val waitResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -102,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         return AdapterView.OnItemClickListener { _, _, pos, _ ->
             mainScope.launch {
                 val commandSelected = commandsListValues[pos]
-                showCommandContent(commandSelected)
+                showCommandContent(commandSelected.filename)
             }
         }
     }
@@ -133,7 +134,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeRealTimeText(text: CharSequence?, before: Int, count: Int) {
-        var fileNames: List<String>? = null
+        var fileNames: List<CommandModelView>? = null
         val command: String = (text ?: "").trim().toString()
         when {
             !command.isEmpty() -> mainScope.launch {
@@ -149,8 +150,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun getCommandData(command: String): List<String>? {
-        var data: List<String>? = null
+    private suspend fun getCommandData(command: String): List<CommandModelView>? {
+        var data: List<CommandModelView>? = null
         try {
             data = dbDataManager.getFileNames(command)
         } catch (e: Exception) {
@@ -159,7 +160,7 @@ class MainActivity : AppCompatActivity() {
         return data
     }
 
-    private suspend fun showCommandOrList(filenames: List<String>?): Unit {
+    private suspend fun showCommandOrList(filenames: List<CommandModelView>?): Unit {
         if (filenames == null) {
             showDefaultCommandHint()
             return
@@ -167,7 +168,7 @@ class MainActivity : AppCompatActivity() {
 
         filenames.size.let {
             when (it) {
-                1 -> showCommandContent(filenames[0])
+                1 -> showCommandContent(filenames[0].filename)
                 in 2..it -> showCommandList(filenames)
                 else -> showDefaultCommandHint()
             }
@@ -181,14 +182,13 @@ class MainActivity : AppCompatActivity() {
         markman.setMark(content, commandInfoText)
     }
 
-    private suspend fun showCommandList(list: List<String>): Unit {
+    private suspend fun showCommandList(list: List<CommandModelView>): Unit {
         commandsListValues = list
         Utils.setViewVisibility(ctnInfoText, View.GONE)
         Utils.setViewVisibility(listCommands, View.VISIBLE)
 
-        val elements: ArrayAdapter<String> = ArrayAdapter(
+        val elements: CustomListAdapter = CustomListAdapter(
             this,
-            android.R.layout.simple_list_item_1,
             list
         )
 
