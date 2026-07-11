@@ -140,16 +140,10 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
-                    android:id="@+id/infoTextMain"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:hint="@string/hint_main_info_command"
-                    android:padding="10dp"
-                    android:singleLine="false"
-                    android:textColor="@color/text_color_on_dark"
-                    android:textColorHint="@color/text_color_on_dark"
-                    android:scrollbars="none" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/infoTextMainR"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
             </LinearLayout>
 

@@ -29,6 +29,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.adapters.CommandModelView
 import com.srm.whysudo.adapters.CustomListAdapter
@@ -38,6 +39,7 @@ import com.srm.whysudo.utils.ConfigDialog
 import com.srm.whysudo.utils.CustomDialog
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.Utils
+import com.srm.whysudo.utils.Utils.hideKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -47,7 +49,7 @@ import kotlin.system.exitProcess
 class MainActivity : AppCompatActivity() {
     private lateinit var inputCommandSearch: TextInputEditText
     private lateinit var ctnInfoText: View
-    private lateinit var commandInfoText: TextView
+    private lateinit var commandInfoText: RecyclerView
     private lateinit var markman: MarkdownManager
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
@@ -81,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
-        commandInfoText = findViewById<TextView>(R.id.infoTextMain)
+        commandInfoText = findViewById<RecyclerView>(R.id.infoTextMainR)
         footerTxt = findViewById<TextView>(R.id.footerText)
         listCommands = findViewById<ListView>(R.id.listCommands)
         btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
@@ -104,6 +106,7 @@ class MainActivity : AppCompatActivity() {
             mainScope.launch {
                 val commandSelected = commandsListValues[pos]
                 showCommandContent(commandSelected.filename)
+                hideKeyboard()
             }
         }
     }
@@ -112,7 +115,7 @@ class MainActivity : AppCompatActivity() {
         mainScope.launch {
             inputCommandSearch.isEnabled = false
             Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
-            commandInfoText.text = getString(R.string.loading_msg)
+            markman.setMark(getString(R.string.loading_msg))
         }
     }
 
@@ -179,7 +182,7 @@ class MainActivity : AppCompatActivity() {
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         val content = dbDataManager.getCommandContent(name)
-        markman.setMark(content, commandInfoText)
+        markman.setMark(content)
     }
 
     private suspend fun showCommandList(list: List<CommandModelView>): Unit {
@@ -200,7 +203,7 @@ class MainActivity : AppCompatActivity() {
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
         val placeholderDefault = getString(R.string.hint_main_info_command)
         val msg = showRandomCommand(placeholderDefault)
-        markman.setMark(msg, commandInfoText)
+        markman.setMark(msg)
     }
 
     private suspend fun showRandomCommand(initialMessage: String): String {

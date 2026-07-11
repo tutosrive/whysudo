@@ -16,34 +16,34 @@ package com.srm.whysudo.markdown
 
 import android.content.Context
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.text.method.ScrollingMovementMethod
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
-import com.srm.whysudo.BuildConfig
 import com.srm.whysudo.MainActivity
 import com.srm.whysudo.R
 import com.srm.whysudo.utils.Utils
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonSpansFactory
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.movement.MovementMethodPlugin
-import org.commonmark.node.FencedCodeBlock
 
 class MarkdownManager(val ctx: Context) {
     var mark: Markwon
-//    var adapterList
+    val markCommon: MarkCommon = MarkCommon()
 
     init {
-
         val markBuilder = configMarkwon()
         mark = markBuilder.build()
+        markCommon.configAdapterMarkwon(ctx)
+    }
+
+    fun setMark(text: String) {
+        markCommon.setMark(mark, text)
     }
 
     fun setMark(text: String, textView: TextView) {
         mark.setMarkdown(textView, text)
     }
+
 
     private fun configMarkwon(): Markwon.Builder {
         return Markwon.builder(ctx)
@@ -52,9 +52,9 @@ class MarkdownManager(val ctx: Context) {
                     when (ctx) {
                         is MainActivity -> {
                             codeStyles(builder)
-                            listStyles(builder)
                         }
                     }
+                    listStyles(builder)
                 }
             })
             .usePlugin(MovementMethodPlugin.create(ScrollingMovementMethod.getInstance()))

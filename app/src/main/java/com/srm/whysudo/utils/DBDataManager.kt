@@ -153,7 +153,6 @@ class DBDataManager(
         }
     }
 
-    // TODO: Fix old format List to new Format (CommandModelView) and manage with CustomListAdapter on PRO
     suspend fun getAllCommands(): List<CommandModelView> {
         return withContext(Dispatchers.IO) {
             val filenames: MutableList<CommandModelView> = mutableListOf()
