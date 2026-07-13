@@ -97,9 +97,10 @@ class AllCommands : AppCompatActivity() {
     private fun loadCommand(): AdapterView.OnItemClickListener {
         return AdapterView.OnItemClickListener { _, _, pos, _ ->
             mainScope.launch {
-                val commandSelected = allCommands[pos].filename
+                val commandSelected = allCommands[pos]
                 val result = Intent()
-                result.putExtra("command", commandSelected)
+                result.putExtra("command", commandSelected.filename)
+                result.putExtra("isFavorite", commandSelected.isFavorite)
 
                 setResult(RESULT_OK, result)
                 finish()

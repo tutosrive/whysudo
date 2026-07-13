@@ -33,6 +33,7 @@ class MarkdownManager(val ctx: Context) {
     init {
         val markBuilder = configMarkwon()
         mark = markBuilder.build()
+        // TODO: Create this common class in FREE
         markCommon.configAdapterMarkwon(ctx)
     }
 

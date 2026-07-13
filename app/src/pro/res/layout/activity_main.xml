@@ -131,21 +131,45 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <FrameLayout
                 android:id="@+id/ctnInfoText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_background"
-                android:backgroundTint="@color/background_dark_glass"
-                android:orientation="vertical"
-                android:padding="10dp">
+                android:layout_height="wrap_content">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/infoTextMainR"
+                <ImageButton
+                    android:id="@+id/btnFavorite"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="top|end"
+                    android:background="#00FFFFFF"
+                    android:elevation="18dp"
+                    android:translationX="-5sp"
+                    android:translationY="5sp"
+                    app:srcCompat="@drawable/ic_star" />
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_background"
+                    android:backgroundTint="@color/background_dark_glass"
+                    android:orientation="vertical"
+                    android:padding="10dp">
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/commandHintDefault"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/infoTextMainR"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:elevation="-1dp" />
+
+                </LinearLayout>
+
+            </FrameLayout>
 
             <ListView
                 android:id="@+id/listCommands"

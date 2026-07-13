@@ -17,6 +17,7 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
@@ -44,26 +45,31 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
+    private var commandClickedId by Delegates.notNull<Int>()
     private lateinit var inputCommandSearch: TextInputEditText
     private lateinit var ctnInfoText: View
     private lateinit var commandInfoText: RecyclerView
     private lateinit var markman: MarkdownManager
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
+    private lateinit var commandHintView: TextView
     private lateinit var listCommands: ListView
     private lateinit var commandsListValues: List<CommandModelView>
     private lateinit var btnSeeAllCommands: ImageButton
+    private lateinit var btnSetFavorite: ImageButton
     private val waitResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
             val command = data?.getStringExtra("command")
+            val favorite = data?.getBooleanExtra("isFavorite", false) ?: false
             lifecycleScope.launch {
-                showCommandContent("$command")
+                showCommandContent("$command", favorite)
             }
         }
     }
@@ -81,12 +87,23 @@ class MainActivity : AppCompatActivity() {
         }
         @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        getViews()
+        loadFilesData()
+        initialListeners()
+    }
+
+    private fun getViews(): Unit {
         ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<RecyclerView>(R.id.infoTextMainR)
         footerTxt = findViewById<TextView>(R.id.footerText)
         listCommands = findViewById<ListView>(R.id.listCommands)
         btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
+        btnSetFavorite = findViewById<ImageButton>(R.id.btnFavorite)
+        commandHintView = findViewById<TextView>(R.id.commandHintDefault)
+    }
+
+    private fun loadFilesData(): Unit {
         markman = MarkdownManager(this)
         loadFooterDate()
 
@@ -97,15 +114,30 @@ class MainActivity : AppCompatActivity() {
             callbackOnError = { showDefaultError() }
         )
         listCommands.onItemClickListener = handleListItemClick()
-        btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
         Utils.loadLicensesFiles(this)
+    }
+
+    private fun initialListeners(): Unit {
+        btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
+        btnSetFavorite.setOnClickListener { v ->
+            mainScope.launch {
+                Log.i("MainActivity", "Command ID: $commandClickedId")
+                val setFavoriteOk = dbDataManager.saveFavorite(commandClickedId)
+                if (setFavoriteOk) {
+                    notifyFavoriteToView(true)
+                }
+            }
+        }
     }
 
     private fun handleListItemClick(): AdapterView.OnItemClickListener {
         return AdapterView.OnItemClickListener { _, _, pos, _ ->
             mainScope.launch {
                 val commandSelected = commandsListValues[pos]
-                showCommandContent(commandSelected.filename)
+                commandClickedId = commandSelected.id
+                showCommandContent(
+                    commandSelected.filename, commandSelected.isFavorite
+                )
                 hideKeyboard()
             }
         }
@@ -115,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         mainScope.launch {
             inputCommandSearch.isEnabled = false
             Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
-            markman.setMark(getString(R.string.loading_msg))
+            markman.setMark(getString(R.string.loading_msg), commandHintView)
         }
     }
 
@@ -128,7 +160,6 @@ class MainActivity : AppCompatActivity() {
         mainScope.launch {
             showDefaultCommandHint()
             inputCommandSearch.isEnabled = true
-
             inputCommandSearch.hint = getString(R.string.input_search_main_hint)
             inputCommandSearch.doOnTextChanged { text, _, before, count ->
                 changeRealTimeText(text, before, count)
@@ -171,16 +202,23 @@ class MainActivity : AppCompatActivity() {
 
         filenames.size.let {
             when (it) {
-                1 -> showCommandContent(filenames[0].filename)
+                1 -> {
+                    val selected = filenames[0]
+                    showCommandContent(selected.filename, selected.isFavorite)
+                }
+
                 in 2..it -> showCommandList(filenames)
                 else -> showDefaultCommandHint()
             }
         }
     }
 
-    private suspend fun showCommandContent(name: String): Unit {
+    private suspend fun showCommandContent(name: String, isFavorite: Boolean): Unit {
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
+        Utils.setViewVisibility(commandHintView, View.GONE)
+
+        notifyFavoriteToView(isFavorite)
         val content = dbDataManager.getCommandContent(name)
         markman.setMark(content)
     }
@@ -201,17 +239,23 @@ class MainActivity : AppCompatActivity() {
     private suspend fun showDefaultCommandHint(): Unit {
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
+        Utils.setViewVisibility(commandHintView, View.VISIBLE)
         val placeholderDefault = getString(R.string.hint_main_info_command)
-        val msg = showRandomCommand(placeholderDefault)
-        markman.setMark(msg)
+        val noteMsg = getString(R.string.default_command_note_header)
+        val msg = "${placeholderDefault}\n---\n${noteMsg}\n---\n"
+//        val msg = getRandomCommand(placeholderDefault)
+        val randomCommand = getRandomCommand()
+        markman.setMark(msg, commandHintView)
+        markman.setMark(randomCommand)
     }
 
-    private suspend fun showRandomCommand(initialMessage: String): String {
-        val id = Utils.getRandomIdInt()
-        val command = dbDataManager.getCommandById(id)
-        val noteMsg = getString(R.string.default_command_note_header)
-        val msg = "${initialMessage}\n---\n${noteMsg}\n---\n${command}"
-        return msg
+    private suspend fun getRandomCommand(): String {
+        commandClickedId = Utils.getRandomIdInt()
+        val command = dbDataManager.getCommandById(commandClickedId)
+//        val noteMsg = getString(R.string.default_command_note_header)
+//        val msg = "${initialMessage}\n---\n${noteMsg}\n---\n${command}"
+//        val msg = "${initialMessage}\n---\n${noteMsg}\n---\n"
+        return command
     }
 
     fun showDefaultError(): Unit {
@@ -230,6 +274,13 @@ class MainActivity : AppCompatActivity() {
                 callbackOnDismiss = exit
             )
             CustomDialog(ctx, config)
+        }
+    }
+
+    private fun notifyFavoriteToView(isFavorite: Boolean): Unit {
+        when (isFavorite) {
+            true -> btnSetFavorite.setImageResource(R.drawable.ic_star_filled)
+            false -> btnSetFavorite.setImageResource(R.drawable.ic_star)
         }
     }
 

@@ -73,6 +73,12 @@ class MainActivity : AppCompatActivity() {
         }
         @Suppress("SourceLockedOrientationActivity")
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        loadViews()
+        loadFilesData()
+        initialListeners()
+    }
+
+    private fun loadViews(): Unit {
         ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<TextView>(R.id.infoTextMain)
@@ -82,6 +88,9 @@ class MainActivity : AppCompatActivity() {
         btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
         btnUnlockPro = findViewById<Button>(R.id.buy_pro_btn_home)
         layUnlockPro = findViewById<LinearLayout>(R.id.lay_unlock_pro_home)
+    }
+
+    private fun loadFilesData(): Unit {
         markman = MarkdownManager(this)
         loadFooterDate()
 
@@ -92,8 +101,11 @@ class MainActivity : AppCompatActivity() {
             callbackOnError = { showDefaultError() }
         )
         listCommands.onItemClickListener = handleListItemClick()
-        btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
         Utils.loadLicensesFiles(this)
+    }
+
+    private fun initialListeners(): Unit {
+        btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
         btnUnlockPro.setOnClickListener {
             val intent = Intent(
                 Intent.ACTION_VIEW,

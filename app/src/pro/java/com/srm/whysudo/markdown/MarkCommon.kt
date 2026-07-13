@@ -21,13 +21,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.srm.whysudo.MainActivity
 import com.srm.whysudo.R
+import com.srm.whysudo.interfaces.MarkCommon
 import io.noties.markwon.Markwon
 import io.noties.markwon.recycler.MarkwonAdapter
 import org.commonmark.node.FencedCodeBlock
 
-class MarkCommon {
+class MarkCommon : MarkCommon {
     private lateinit var adapterListFencedCode: MarkwonAdapter
-    fun configAdapterMarkwon(ctx: Context): Unit {
+    override fun configAdapterMarkwon(ctx: Context): Unit {
         when (ctx) {
             is MainActivity -> {
                 adapterListFencedCode = MarkwonAdapter
