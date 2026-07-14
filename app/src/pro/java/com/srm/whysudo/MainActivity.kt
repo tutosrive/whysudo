@@ -24,6 +24,7 @@ import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -61,18 +62,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var commandsListValues: List<CommandModelView>
     private lateinit var btnSeeAllCommands: ImageButton
     private lateinit var btnSetFavorite: ImageButton
-    private val waitResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val command = data?.getStringExtra("command")
-            val favorite = data?.getBooleanExtra("isFavorite", false) ?: false
-            lifecycleScope.launch {
-                showCommandContent("$command", favorite)
-            }
-        }
-    }
+    private val waitResult = waitAllcomandsResult()
 
     val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -281,6 +271,22 @@ class MainActivity : AppCompatActivity() {
         when (isFavorite) {
             true -> btnSetFavorite.setImageResource(R.drawable.ic_star_filled)
             false -> btnSetFavorite.setImageResource(R.drawable.ic_star)
+        }
+    }
+
+    private fun waitAllcomandsResult(): ActivityResultLauncher<Intent?> {
+        return registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val data = result.data
+                val command = data?.getStringExtra("command")
+                val favorite = data?.getBooleanExtra("isFavorite", false) ?: false
+                commandClickedId = data?.getIntExtra("idCommand", -1)!!
+                lifecycleScope.launch {
+                    showCommandContent("$command", favorite)
+                }
+            }
         }
     }
 

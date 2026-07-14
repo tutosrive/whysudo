@@ -101,6 +101,7 @@ class AllCommands : AppCompatActivity() {
                 val result = Intent()
                 result.putExtra("command", commandSelected.filename)
                 result.putExtra("isFavorite", commandSelected.isFavorite)
+                result.putExtra("idCommand", commandSelected.id)
 
                 setResult(RESULT_OK, result)
                 finish()
