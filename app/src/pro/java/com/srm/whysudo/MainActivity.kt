@@ -17,12 +17,12 @@ package com.srm.whysudo
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -111,10 +111,16 @@ class MainActivity : AppCompatActivity() {
         btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
         btnSetFavorite.setOnClickListener { v ->
             mainScope.launch {
-                Log.i("MainActivity", "Command ID: $commandClickedId")
                 val setFavoriteOk = dbDataManager.saveFavorite(commandClickedId)
                 if (setFavoriteOk) {
                     notifyFavoriteToView(true)
+                } else {
+                    val msg = getString(R.string.msg_favorite_error)
+                    Toast.makeText(
+                        this@MainActivity,
+                        msg,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -213,7 +219,7 @@ class MainActivity : AppCompatActivity() {
         markman.setMark(content)
     }
 
-    private suspend fun showCommandList(list: List<CommandModelView>): Unit {
+    private fun showCommandList(list: List<CommandModelView>): Unit {
         commandsListValues = list
         Utils.setViewVisibility(ctnInfoText, View.GONE)
         Utils.setViewVisibility(listCommands, View.VISIBLE)
@@ -233,7 +239,6 @@ class MainActivity : AppCompatActivity() {
         val placeholderDefault = getString(R.string.hint_main_info_command)
         val noteMsg = getString(R.string.default_command_note_header)
         val msg = "${placeholderDefault}\n---\n${noteMsg}\n---\n"
-//        val msg = getRandomCommand(placeholderDefault)
         val randomCommand = getRandomCommand()
         markman.setMark(msg, commandHintView)
         markman.setMark(randomCommand)
@@ -242,9 +247,6 @@ class MainActivity : AppCompatActivity() {
     private suspend fun getRandomCommand(): String {
         commandClickedId = Utils.getRandomIdInt()
         val command = dbDataManager.getCommandById(commandClickedId)
-//        val noteMsg = getString(R.string.default_command_note_header)
-//        val msg = "${initialMessage}\n---\n${noteMsg}\n---\n${command}"
-//        val msg = "${initialMessage}\n---\n${noteMsg}\n---\n"
         return command
     }
 

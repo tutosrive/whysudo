@@ -15,16 +15,16 @@
 package com.srm.whysudo.database_man
 
 import android.content.Context
-import android.util.Log
+import com.srm.whysudo.utils.SharedSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.zetetic.database.sqlcipher.SQLiteConnection
 import net.zetetic.database.sqlcipher.SQLiteDatabase
 import net.zetetic.database.sqlcipher.SQLiteDatabaseHook
-import kotlin.collections.contains
 
 class DbManager(dbName: String, ctx: Context, qr: String) {
+    val shPref: SharedSettings = SharedSettings(ctx)
     var conn: SQLiteDatabase
     val hook = object : SQLiteDatabaseHook {
         override fun preKey(p0: SQLiteConnection?) {}
@@ -49,32 +49,15 @@ class DbManager(dbName: String, ctx: Context, qr: String) {
         conn.close()
     }
 
-
     private fun handleStarter(): Unit {
         CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val cols = conn.rawQuery("SELECT * FROM file limit 1")
-                    .columnNames
-
-                if (!cols.contains("is_favorite")) {
-                    Log.i(this::class.java.simpleName, "Cols don't contains is_favorite")
-                    DbStarter(conn).startDb().invokeOnCompletion()
-                    {
-                        val a = conn.rawQuery("SELECT * FROM file limit 1")
-                            .columnNames
-
-                        Log.i(this::class.java.simpleName, a.joinToString(","))
-                        Log.i(
-                            this::class.java.simpleName,
-                            "Line after first select, inside invokeCompletion"
-                        )
-                    }
-                } else {
-                    Log.i(this::class.java.simpleName, "Favorite column EXIST")
-                    Log.i(this::class.java.simpleName, cols.joinToString(","))
+            val isFavoriteColCreated: Boolean = shPref.getPref(
+                "favorite_col_created", false
+            )
+            if (!isFavoriteColCreated) {
+                DbStarter(conn).startDb().invokeOnCompletion {
+                    shPref.savePref("favorite_col_created", true)
                 }
-            } catch (e: Exception) {
-                Log.i(this::class.java.simpleName, e.message.toString())
             }
         }
     }

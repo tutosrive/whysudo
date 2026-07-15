@@ -18,7 +18,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.activity.enableEdgeToEdge
@@ -88,8 +87,7 @@ class AllCommands : AppCompatActivity() {
     private fun loadCommandsData(): Unit {
         mainScope.launch {
             allCommands = dbMan.getAllCommands()
-            // TODO: Decrease the initial load time (DB is loaded so fast ...)
-            delay(300)
+            delay(50)
             dataOnFinishLoad()
         }
     }

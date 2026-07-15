@@ -16,10 +16,8 @@ package com.srm.whysudo.utils
 
 import android.content.Context
 import android.database.Cursor
-import android.util.Log
 import com.srm.whysudo.adapters.CommandModelView
 import com.srm.whysudo.database_man.DbManager
-import com.srm.whysudo.database_man.DbStarter
 import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.examples.MigrationStub
 import kotlinx.coroutines.CoroutineScope
@@ -196,21 +194,12 @@ class DBDataManager(
             val queryUpdate: String = "UPDATE file SET is_favorite = 1 WHERE id = ?"
             val queryGet: String = "SELECT is_favorite FROM file WHERE id = ?"
             var isOK = false
-
-            try {
-                db.execSQL(queryUpdate, arrayOf(id.toString()))
-                db.rawQuery(queryGet, arrayOf(id.toString())).use {
-                    val cols = it.columnNames.joinToString(",")
-                    Log.i("saveToFavorite", cols)
-                    it.moveToFirst()
-                    if (it.getInt(0) > 0) {
-                        isOK = true
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("saveFavorite", e.message.toString())
+            val paramId = arrayOf(id.toString())
+            db.execSQL(queryUpdate, paramId)
+            db.rawQuery(queryGet, paramId).use {
+                it.moveToFirst()
+                isOK = Utils.intToBoolean(it.getInt(0))
             }
-
             return@withContext isOK
         }
     }
