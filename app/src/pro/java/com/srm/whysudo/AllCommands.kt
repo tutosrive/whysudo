@@ -18,13 +18,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.srm.whysudo.adapters.CommandModelView
+import com.srm.whysudo.adapters.CustomListAdapter
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AllCommands : AppCompatActivity() {
-    private lateinit var allCommands: List<String>
+    private lateinit var allCommands: List<CommandModelView>
     private lateinit var dbMan: DBDataManager
     private lateinit var loadingL: LinearLayout
     private lateinit var errorL: LinearLayout
@@ -86,8 +87,7 @@ class AllCommands : AppCompatActivity() {
     private fun loadCommandsData(): Unit {
         mainScope.launch {
             allCommands = dbMan.getAllCommands()
-            // TODO: Decrease the initial load time (DB is loaded so fast ...)
-            delay(300)
+            delay(50)
             dataOnFinishLoad()
         }
     }
@@ -97,7 +97,9 @@ class AllCommands : AppCompatActivity() {
             mainScope.launch {
                 val commandSelected = allCommands[pos]
                 val result = Intent()
-                result.putExtra("command", commandSelected)
+                result.putExtra("command", commandSelected.filename)
+                result.putExtra("isFavorite", commandSelected.isFavorite)
+                result.putExtra("idCommand", commandSelected.id)
 
                 setResult(RESULT_OK, result)
                 finish()
@@ -110,9 +112,8 @@ class AllCommands : AppCompatActivity() {
         Utils.setViewVisibility(errorL, View.GONE)
         Utils.setViewVisibility(layoutAllCommands, View.VISIBLE)
 
-        val elements: ArrayAdapter<String> = ArrayAdapter(
+        val elements: CustomListAdapter = CustomListAdapter(
             this,
-            android.R.layout.simple_list_item_1,
             allCommands
         )
 

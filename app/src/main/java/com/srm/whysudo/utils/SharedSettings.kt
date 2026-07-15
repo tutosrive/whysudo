@@ -45,11 +45,11 @@ class SharedSettings(ctx: Context) {
         return sharedPref.getString(key, default)
     }
 
-    fun getPref(key: String, default: Boolean = true): Boolean {
+    fun getPref(key: String, default: Boolean): Boolean {
         return sharedPref.getBoolean(key, default)
     }
 
-    fun getPref(key: String, default: Float = 0f): Float {
+    fun getPref(key: String, default: Float): Float {
         return sharedPref.getFloat(key, default)
     }
 }

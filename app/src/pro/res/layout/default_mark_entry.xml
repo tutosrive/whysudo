@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2026 tutosrive. All rights reserved.
   ~
   ~ Author: tutosrive
@@ -12,9 +12,10 @@
   ~ In no event shall the author be liable for any claim or damages.
   -->
 
-<resources>
-    <string name="app_name">Why Sudo? - Pro</string>
-    <string name="footer_message">© YEAR - tutosrive - PREMIUM version</string>
-    <string name="description_btn_copy_command">Copy command as text to the ClipBoard.</string>
-    <string name="msg_favorite_error">Something wrong when try set this command as favorite.</string>
-</resources>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:textSize="14sp"
+    android:textColor="?android:attr/textColorPrimary"
+    android:lineSpacingExtra="4dp" />

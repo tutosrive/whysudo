@@ -32,6 +32,7 @@ class DBDataManager(
     val callbackOnFinishLoad: (() -> Unit)? = null,
     val callbackOnError: (() -> Unit)? = null
 ) {
+    val sharedPref = SharedSettings(this.ctx)
     val fileDataName: String = DataFileName.DB_COMMANDS()
     private lateinit var dbMan: DbManager
     private lateinit var db: SQLiteDatabase
@@ -87,7 +88,7 @@ class DBDataManager(
             val cmdSplit: List<String> = command.split("\\s+".toRegex())
             val cmd = cmdSplit.joinToString(separator = "-")
             val query =
-                """SELECT filename, is_pro FROM file F
+                """SELECT F.id, filename, is_pro, is_favorite FROM file F
                     INNER JOIN version V ON F.type_version = V.id
                     WHERE filename = ?
                     OR F.id IN (SELECT rowid FROM file_fts WHERE file_fts MATCH '$lang:${
@@ -107,11 +108,18 @@ class DBDataManager(
     }
 
     private fun makeCommandObj(res: Cursor): CommandModelView {
-        val name = res.getString(0)
+        val id = res.getInt(0)
+        val name = res.getString(1)
         val type = Utils.intToBoolean(
-            res.getInt(1)
+            res.getInt(2)
         )
-        val obj: CommandModelView = CommandModelView(name, type)
+        val favorite = Utils.intToBoolean(
+            res.getInt(3)
+        )
+        val obj: CommandModelView = CommandModelView(
+            id, name,
+            type, favorite
+        )
         return obj
     }
 
@@ -138,13 +146,11 @@ class DBDataManager(
 
     @Throws(Exception::class)
     suspend fun getCommandContent(command: String, lang: String = "en"): String {
-        val cmd = command.replace(" - FREE", "")
-        println(cmd)
         return withContext(Dispatchers.IO) {
             var content: String
             val query = """SELECT $lang FROM content_language C
                 inner join file F on C.id = F.id_data WHERE filename = ?"""
-            db.rawQuery(query, arrayOf(cmd)).use {
+            db.rawQuery(query, arrayOf(command)).use {
                 it.moveToFirst()
                 content = it.getString(0)
                 it.close()
@@ -153,15 +159,15 @@ class DBDataManager(
         }
     }
 
-    // TODO: Fix old format List to new Format (CommandModelView) and manage with CustomListAdapter on PRO
-    suspend fun getAllCommands(): List<String> {
+    suspend fun getAllCommands(): List<CommandModelView> {
         return withContext(Dispatchers.IO) {
-            val filenames: MutableList<String> = mutableListOf()
-            val query = """SELECT concat(filename, ' - ', suffix) filename FROM file F
+            val filenames: MutableList<CommandModelView> = mutableListOf()
+            val query = """SELECT F.id, filename, is_pro, is_favorite FROM file F
                     INNER JOIN version V ON F.type_version = V.id"""
             db.rawQuery(query).use {
                 while (it.moveToNext()) {
-                    filenames.add(it.getString(0))
+                    val command: CommandModelView = makeCommandObj(it)
+                    filenames.add(command)
                 }
                 it.close()
             }
@@ -183,18 +189,28 @@ class DBDataManager(
         }
     }
 
+    suspend fun saveFavorite(id: Int): Boolean {
+        return withContext(Dispatchers.IO) {
+            val queryUpdate: String = "UPDATE file SET is_favorite = 1 WHERE id = ?"
+            val queryGet: String = "SELECT is_favorite FROM file WHERE id = ?"
+            var isOK = false
+            val paramId = arrayOf(id.toString())
+            db.execSQL(queryUpdate, paramId)
+            db.rawQuery(queryGet, paramId).use {
+                it.moveToFirst()
+                isOK = Utils.intToBoolean(it.getInt(0))
+            }
+            return@withContext isOK
+        }
+    }
+
     fun formatRegex(commandSplit: List<String>): String {
         var reg = ""
         for (word in commandSplit) reg += "$word* "
         return reg.trimEnd()
     }
 
-    fun close() {
-        dbMan.close()
-    }
-
     private fun loadQr(): String {
-        val sharedPref = SharedSettings(this.ctx)
         var res = sharedPref.getPref("r", "none")
         if (res == "none" || res.isNullOrEmpty() || res.isBlank()) {
             val a = MigrationStub.axk()
@@ -203,5 +219,9 @@ class DBDataManager(
         }
         return res
 
+    }
+
+    fun close() {
+        dbMan.close()
     }
 }

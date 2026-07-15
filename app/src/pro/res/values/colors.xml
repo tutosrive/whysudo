@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2026 tutosrive. All rights reserved.
   ~
   ~ Author: tutosrive
@@ -13,8 +13,6 @@
   -->
 
 <resources>
-    <string name="app_name">Why Sudo? - Pro</string>
-    <string name="footer_message">© YEAR - tutosrive - PREMIUM version</string>
-    <string name="description_btn_copy_command">Copy command as text to the ClipBoard.</string>
-    <string name="msg_favorite_error">Something wrong when try set this command as favorite.</string>
+    <color name="ligth_blue_alpha">#2780D8FF</color>
+    <color name="screamin_green">#7FF880</color>
 </resources>

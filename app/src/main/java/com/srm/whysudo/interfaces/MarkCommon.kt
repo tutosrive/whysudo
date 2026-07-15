@@ -12,11 +12,10 @@
  * In no event shall the author be liable for any claim or damages.
  */
 
-package com.srm.whysudo.adapters
+package com.srm.whysudo.interfaces
 
-class CommandModelView(
-    val id: Int,
-    val filename: String,
-    val typeVersion: Boolean,
-    val isFavorite: Boolean
-)
+import android.content.Context
+
+interface MarkCommon {
+    fun configAdapterMarkwon(ctx: Context): Unit
+}
