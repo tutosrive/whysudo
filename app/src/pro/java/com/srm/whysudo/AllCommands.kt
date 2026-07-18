@@ -18,8 +18,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -27,9 +29,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.srm.whysudo.adapters.CommandModelView
 import com.srm.whysudo.adapters.CustomListAdapter
 import com.srm.whysudo.utils.DBDataManager
+import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -114,7 +118,8 @@ class AllCommands : AppCompatActivity() {
 
         val elements: CustomListAdapter = CustomListAdapter(
             this,
-            allCommands
+            allCommands,
+            dbMan
         )
 
         viewListCommands.adapter = elements

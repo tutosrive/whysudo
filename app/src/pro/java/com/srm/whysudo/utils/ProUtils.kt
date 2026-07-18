@@ -12,11 +12,16 @@
  * In no event shall the author be liable for any claim or damages.
  */
 
-package com.srm.whysudo.adapters
+package com.srm.whysudo.utils
 
-class CommandModelView(
-    val id: Int,
-    val filename: String,
-    val typeVersion: Boolean,
-    var isFavorite: Boolean
-)
+import android.widget.ImageView
+import com.srm.whysudo.R
+
+object ProUtils {
+    fun notifyFavoriteToView(imageViewer: ImageView, isFavorite: Boolean): Unit {
+        when (isFavorite) {
+            true -> imageViewer.setImageResource(R.drawable.ic_star_filled)
+            false -> imageViewer.setImageResource(R.drawable.ic_star)
+        }
+    }
+}

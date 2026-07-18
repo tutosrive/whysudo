@@ -14,9 +14,9 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#FFFFFF" />
+    <solid android:color="@color/background_dark_glass" />
     <corners android:radius="20dp" />
     <stroke
         android:width="2dp"
-        android:color="#000000" />
+        android:color="@color/dark_blue" />
 </shape>
