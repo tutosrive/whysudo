@@ -21,27 +21,30 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.srm.whysudo.R
-import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.ProUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class CustomListAdapter(
     val ctx: Context,
     private val commandsList: List<CommandModelView>,
-    val dbMan: DBDataManager
+    val callback: (id: CommandModelView, iconViewer: ImageView) -> Unit
 ) :
     ArrayAdapter<CommandModelView>(ctx, 0, commandsList) {
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var commandView = convertView
-        val command: CommandModelView = getItem(position)!!
+    private lateinit var commandText: TextView
+    private lateinit var commandBadge: ImageView
+    private lateinit var favoriteIcon: ImageView
+    private lateinit var command: CommandModelView
 
-        if (commandView == null) {
-            commandView = LayoutInflater.from(ctx)
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        return initializer(convertView, position, parent)
+    }
+
+    private fun initializer(convertView: View?, pos: Int, parent: ViewGroup): View {
+        var view = convertView
+        command = getItem(pos)!!
+
+        if (view == null) {
+            view = LayoutInflater.from(ctx)
                 .inflate(
                     R.layout.custom_item_list_commands,
                     parent,
@@ -49,51 +52,33 @@ class CustomListAdapter(
                 )
         }
 
-        val commandText: TextView = commandView.findViewById<TextView>(R.id.commandItem)
-        val commandBadge: ImageView = commandView.findViewById<ImageView>(R.id.itemListBadge)
-        val favoriteIcon: ImageView = commandView.findViewById<ImageView>(R.id.btnSetFavorite)
+        getViews(view)
+        setDataInViews(view)
+        return view
+    }
 
+    private fun getViews(view: View): Unit {
+        commandText = view.findViewById<TextView>(R.id.commandItem)
+        commandBadge = view.findViewById<ImageView>(R.id.itemListBadge)
+        favoriteIcon = view.findViewById<ImageView>(R.id.btnSetFavorite)
+    }
+
+    private fun setDataInViews(view: View): Unit {
         commandText.text = command.filename
         setBadgePro(command, commandBadge)
         setBadgeFavorite(command, favoriteIcon)
-        setFavoriteListener(favoriteIcon, command, commandView)
-
-        return commandView
+        setFavoriteListener(command, favoriteIcon)
     }
 
-    private fun setFavoriteListener(btn: ImageView, command: CommandModelView, view: View): Unit {
-        val commandId: Int = command.id
-        btn.setOnClickListener {
-            CoroutineScope(Dispatchers.Main).launch {
-                val setIsOk: Boolean = dbMan.saveFavorite(commandId)
-
-                if (setIsOk) {
-                    command.isFavorite = true
-                    setBadgeFavorite(command, btn)
-                    Toast.makeText(
-                        ctx,
-                        "Command Marked As Favorite",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    val msg = ctx.getString(R.string.msg_favorite_error)
-                    Toast.makeText(
-                        ctx,
-                        msg,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-            this.notifyDataSetChanged()
+    private fun setFavoriteListener(command: CommandModelView, view: ImageView): Unit {
+        view.setOnClickListener {
+            callback(command, it as ImageView)
         }
+        this.notifyDataSetChanged()
     }
 
     private fun isPro(command: CommandModelView): Boolean {
         return command.typeVersion
-    }
-
-    private fun isFavorite(command: CommandModelView): Boolean {
-        return command.isFavorite
     }
 
     private fun setBadgePro(cmd: CommandModelView, badge: ImageView): Unit {
@@ -102,12 +87,7 @@ class CustomListAdapter(
     }
 
     private fun setBadgeFavorite(cmd: CommandModelView, badge: ImageView): Unit {
-        val drawableId: Int = if (isFavorite(cmd)) {
-            R.drawable.ic_star_filled
-        } else {
-            R.drawable.ic_star
-        }
-        setDrawable(drawableId, badge)
+        ProUtils.toggleFavoriteIcon(badge, cmd.isFavorite)
     }
 
     private fun setDrawable(id: Int, badge: ImageView): Unit {

@@ -21,7 +21,6 @@ import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -33,7 +32,6 @@ import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -116,10 +114,14 @@ class AllCommands : AppCompatActivity() {
         Utils.setViewVisibility(errorL, View.GONE)
         Utils.setViewVisibility(layoutAllCommands, View.VISIBLE)
 
+        val callback = { c: CommandModelView, v: ImageView ->
+            ProUtils.setCommandAsFavorite(this@AllCommands, dbMan, c, v)
+        }
+
         val elements: CustomListAdapter = CustomListAdapter(
             this,
             allCommands,
-            dbMan
+            callback
         )
 
         viewListCommands.adapter = elements
