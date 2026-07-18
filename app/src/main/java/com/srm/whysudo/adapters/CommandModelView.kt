@@ -18,5 +18,5 @@ class CommandModelView(
     val id: Int,
     val filename: String,
     val typeVersion: Boolean,
-    val isFavorite: Boolean
+    var isFavorite: Boolean
 )

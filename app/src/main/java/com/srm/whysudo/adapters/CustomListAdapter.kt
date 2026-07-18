@@ -22,15 +22,29 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.srm.whysudo.R
+import com.srm.whysudo.utils.ProUtils
 
-class CustomListAdapter(val ctx: Context, private val commandsList: List<CommandModelView>) :
+class CustomListAdapter(
+    val ctx: Context,
+    private val commandsList: List<CommandModelView>,
+    val callback: (id: CommandModelView, iconViewer: ImageView) -> Unit
+) :
     ArrayAdapter<CommandModelView>(ctx, 0, commandsList) {
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var commandView = convertView
-        val command: CommandModelView = getItem(position)!!
+    private lateinit var commandText: TextView
+    private lateinit var commandBadge: ImageView
+    private lateinit var favoriteIcon: ImageView
+    private lateinit var command: CommandModelView
 
-        if (commandView == null) {
-            commandView = LayoutInflater.from(ctx)
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        return initializer(convertView, position, parent)
+    }
+
+    private fun initializer(convertView: View?, pos: Int, parent: ViewGroup): View {
+        var view = convertView
+        command = getItem(pos)!!
+
+        if (view == null) {
+            view = LayoutInflater.from(ctx)
                 .inflate(
                     R.layout.custom_item_list_commands,
                     parent,
@@ -38,21 +52,45 @@ class CustomListAdapter(val ctx: Context, private val commandsList: List<Command
                 )
         }
 
-        val commandText: TextView = commandView.findViewById<TextView>(R.id.commandItem)
-        val commandBadge: ImageView = commandView.findViewById<ImageView>(R.id.itemListBadge)
+        getViews(view)
+        setDataInViews(view)
+        return view
+    }
 
+    private fun getViews(view: View): Unit {
+        commandText = view.findViewById<TextView>(R.id.commandItem)
+        commandBadge = view.findViewById<ImageView>(R.id.itemListBadge)
+        favoriteIcon = view.findViewById<ImageView>(R.id.btnSetFavorite)
+    }
+
+    private fun setDataInViews(view: View): Unit {
         commandText.text = command.filename
-        setBadge(command, commandBadge)
+        setBadgePro(command, commandBadge)
+        setBadgeFavorite(command, favoriteIcon)
+        setFavoriteListener(command, favoriteIcon)
+    }
 
-        return commandView
+    private fun setFavoriteListener(command: CommandModelView, view: ImageView): Unit {
+        view.setOnClickListener {
+            callback(command, it as ImageView)
+        }
+        this.notifyDataSetChanged()
     }
 
     private fun isPro(command: CommandModelView): Boolean {
         return command.typeVersion
     }
 
-    private fun setBadge(cmd: CommandModelView, badge: ImageView): Unit {
+    private fun setBadgePro(cmd: CommandModelView, badge: ImageView): Unit {
         val badgeId = if (isPro(cmd)) R.drawable.prob else R.drawable.freeb
-        badge.setImageResource(badgeId)
+        setDrawable(badgeId, badge)
+    }
+
+    private fun setBadgeFavorite(cmd: CommandModelView, badge: ImageView): Unit {
+        ProUtils.toggleFavoriteIcon(badge, cmd.isFavorite)
+    }
+
+    private fun setDrawable(id: Int, badge: ImageView): Unit {
+        badge.setImageResource(id)
     }
 }

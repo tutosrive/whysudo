@@ -28,12 +28,10 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:contentDescription="@string/description_logo_image"
             android:scaleType="center"
-            android:translationX="10dp"
-            android:translationY="10sp"
             app:srcCompat="@mipmap/ic_launcher_foreground" />
 
         <ImageButton
@@ -143,9 +141,9 @@
                     android:layout_gravity="top|end"
                     android:background="#00FFFFFF"
                     android:elevation="18dp"
+                    android:scaleType="fitCenter"
                     android:translationX="-5sp"
-                    android:translationY="5sp"
-                    app:srcCompat="@drawable/ic_star" />
+                    android:translationY="5sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

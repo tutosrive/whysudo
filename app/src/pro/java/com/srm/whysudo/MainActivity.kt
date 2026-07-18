@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -40,6 +41,7 @@ import com.srm.whysudo.utils.BtnDialog
 import com.srm.whysudo.utils.ConfigDialog
 import com.srm.whysudo.utils.CustomDialog
 import com.srm.whysudo.utils.DBDataManager
+import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
 import com.srm.whysudo.utils.Utils.hideKeyboard
 import kotlinx.coroutines.CoroutineScope
@@ -110,19 +112,15 @@ class MainActivity : AppCompatActivity() {
     private fun initialListeners(): Unit {
         btnSeeAllCommands.setOnClickListener { v -> goAllCommands(v) }
         btnSetFavorite.setOnClickListener { v ->
-            mainScope.launch {
-                val setFavoriteOk = dbDataManager.saveFavorite(commandClickedId)
-                if (setFavoriteOk) {
-                    notifyFavoriteToView(true)
-                } else {
-                    val msg = getString(R.string.msg_favorite_error)
-                    Toast.makeText(
-                        this@MainActivity,
-                        msg,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+            setFavorite(commandClickedId)
+        }
+    }
+
+    fun setFavorite(idCommand: Int): Unit {
+        mainScope.launch {
+            val setFavoriteOk = dbDataManager.saveFavorite(idCommand)
+            ProUtils.notifyFavoriteToView(btnSetFavorite, setFavoriteOk)
+            ProUtils.showFavoriteSetToast(this@MainActivity, setFavoriteOk)
         }
     }
 
@@ -213,10 +211,9 @@ class MainActivity : AppCompatActivity() {
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         Utils.setViewVisibility(commandHintView, View.GONE)
-
-        notifyFavoriteToView(isFavorite)
         val content = dbDataManager.getCommandContent(name)
         markman.setMark(content)
+        ProUtils.notifyFavoriteToView(btnSetFavorite, isFavorite, false)
     }
 
     private fun showCommandList(list: List<CommandModelView>): Unit {
@@ -224,9 +221,17 @@ class MainActivity : AppCompatActivity() {
         Utils.setViewVisibility(ctnInfoText, View.GONE)
         Utils.setViewVisibility(listCommands, View.VISIBLE)
 
+        val callback = { c: CommandModelView, v: ImageView ->
+            ProUtils.setCommandAsFavorite(
+                this@MainActivity,
+                dbDataManager, c, v
+            )
+        }
+
         val elements: CustomListAdapter = CustomListAdapter(
             this,
-            list
+            list,
+            callback
         )
 
         listCommands.adapter = elements
@@ -242,6 +247,7 @@ class MainActivity : AppCompatActivity() {
         val randomCommand = getRandomCommand()
         markman.setMark(msg, commandHintView)
         markman.setMark(randomCommand)
+        ProUtils.notifyFavoriteToView(btnSetFavorite, isFavorite = false, animate = false)
     }
 
     private suspend fun getRandomCommand(): String {
@@ -266,13 +272,6 @@ class MainActivity : AppCompatActivity() {
                 callbackOnDismiss = exit
             )
             CustomDialog(ctx, config)
-        }
-    }
-
-    private fun notifyFavoriteToView(isFavorite: Boolean): Unit {
-        when (isFavorite) {
-            true -> btnSetFavorite.setImageResource(R.drawable.ic_star_filled)
-            false -> btnSetFavorite.setImageResource(R.drawable.ic_star)
         }
     }
 
