@@ -20,10 +20,17 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.srm.whysudo.R
+import com.srm.whysudo.adapters.CustomRecyclerAdapter
 import com.srm.whysudo.markdown.MarkdownManager
+import com.srm.whysudo.models.CommandModelView
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -182,6 +189,13 @@ object Utils {
         }
 
         return res
+    }
+
+    fun getBadgeProFreeIconId(isPro: Boolean): Int {
+        return when (isPro) {
+            true -> R.drawable.prob
+            false -> R.drawable.freeb
+        }
     }
 
     fun b(): String {

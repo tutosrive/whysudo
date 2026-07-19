@@ -12,11 +12,11 @@
  * In no event shall the author be liable for any claim or damages.
  */
 
-package com.srm.whysudo.adapters
+package com.srm.whysudo.models
 
-class CommandModelView(
-    val id: Int,
-    val filename: String,
-    val typeVersion: Boolean,
+data class CommandModelView(
+    var id: Int,
+    var filename: String,
+    var typeVersion: Boolean,
     var isFavorite: Boolean
 )

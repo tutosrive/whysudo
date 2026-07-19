@@ -18,12 +18,9 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,10 +29,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
-import com.srm.whysudo.adapters.CommandModelView
-import com.srm.whysudo.adapters.CustomListAdapter
+import com.srm.whysudo.models.CommandModelView
+import com.srm.whysudo.adapters.CustomRecyclerAdapter
 import com.srm.whysudo.markdown.MarkdownManager
 import com.srm.whysudo.utils.BtnDialog
 import com.srm.whysudo.utils.ConfigDialog
@@ -60,13 +59,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dbDataManager: DBDataManager
     private lateinit var footerTxt: TextView
     private lateinit var commandHintView: TextView
-    private lateinit var listCommands: ListView
-    private lateinit var commandsListValues: List<CommandModelView>
+    private lateinit var listCommands: RecyclerView
+    private var commandsListValues: List<CommandModelView> = listOf()
     private lateinit var btnSeeAllCommands: ImageButton
     private lateinit var btnSetFavorite: ImageButton
     private val waitResult = waitAllcomandsResult()
-
     val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    private lateinit var customAdapter: CustomRecyclerAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,10 +89,25 @@ class MainActivity : AppCompatActivity() {
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<RecyclerView>(R.id.infoTextMainR)
         footerTxt = findViewById<TextView>(R.id.footerText)
-        listCommands = findViewById<ListView>(R.id.listCommands)
         btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
         btnSetFavorite = findViewById<ImageButton>(R.id.btnFavorite)
         commandHintView = findViewById<TextView>(R.id.commandHintDefault)
+        listCommands = findViewById<RecyclerView>(R.id.listCommands)
+        listCommands.layoutManager = LinearLayoutManager(this)
+        listCommands.itemAnimator = DefaultItemAnimator()
+
+        customAdapter = CustomRecyclerAdapter(
+            this@MainActivity,
+            commandsListValues,
+            ::handleFavoriteClick,
+            ::handleListItemClick
+        )
+
+        listCommands.adapter = customAdapter
+    }
+
+    private fun setRecyclerAdapter(): Unit {
+
     }
 
     private fun loadFilesData(): Unit {
@@ -105,7 +120,6 @@ class MainActivity : AppCompatActivity() {
             callbackOnFinishLoad = { addListenerEvent() },
             callbackOnError = { showDefaultError() }
         )
-        listCommands.onItemClickListener = handleListItemClick()
         Utils.loadLicensesFiles(this)
     }
 
@@ -124,16 +138,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleListItemClick(): AdapterView.OnItemClickListener {
-        return AdapterView.OnItemClickListener { _, _, pos, _ ->
-            mainScope.launch {
-                val commandSelected = commandsListValues[pos]
-                commandClickedId = commandSelected.id
-                showCommandContent(
-                    commandSelected.filename, commandSelected.isFavorite
-                )
-                hideKeyboard()
-            }
+    private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
+        ProUtils.setCommandAsFavorite(this, dbDataManager, c, v)
+    }
+
+    private fun handleListItemClick(id: Int): Unit {
+        mainScope.launch {
+            val commandSelected: CommandModelView = commandsListValues.find { it.id == id }!!
+            commandClickedId = commandSelected.id
+            showCommandContent(
+                commandSelected.filename, commandSelected.isFavorite
+            )
+            hideKeyboard()
         }
     }
 
@@ -218,23 +234,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showCommandList(list: List<CommandModelView>): Unit {
         commandsListValues = list
+        customAdapter.setData(commandsListValues)
         Utils.setViewVisibility(ctnInfoText, View.GONE)
         Utils.setViewVisibility(listCommands, View.VISIBLE)
-
-        val callback = { c: CommandModelView, v: ImageView ->
-            ProUtils.setCommandAsFavorite(
-                this@MainActivity,
-                dbDataManager, c, v
-            )
-        }
-
-        val elements: CustomListAdapter = CustomListAdapter(
-            this,
-            list,
-            callback
-        )
-
-        listCommands.adapter = elements
     }
 
     private suspend fun showDefaultCommandHint(): Unit {

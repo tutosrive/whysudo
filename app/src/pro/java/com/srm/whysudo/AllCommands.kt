@@ -17,16 +17,17 @@ package com.srm.whysudo
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ListView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.srm.whysudo.adapters.CommandModelView
-import com.srm.whysudo.adapters.CustomListAdapter
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.srm.whysudo.models.CommandModelView
+import com.srm.whysudo.adapters.CustomRecyclerAdapter
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
@@ -37,13 +38,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AllCommands : AppCompatActivity() {
-    private lateinit var allCommands: List<CommandModelView>
+    private var allCommands: List<CommandModelView> = listOf()
     private lateinit var dbMan: DBDataManager
     private lateinit var loadingL: LinearLayout
     private lateinit var errorL: LinearLayout
-    private lateinit var viewListCommands: ListView
+    private lateinit var viewListCommands: RecyclerView
     private lateinit var layoutAllCommands: LinearLayout
     private val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    private lateinit var customAdapter: CustomRecyclerAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -55,17 +57,26 @@ class AllCommands : AppCompatActivity() {
         }
 
         layoutAllCommands = findViewById<LinearLayout>(R.id.commandsListLayout)
-        viewListCommands = findViewById<ListView>(R.id.allCommandsList)
         loadingL = findViewById<LinearLayout>(R.id.loadingLayout)
         errorL = findViewById<LinearLayout>(R.id.erroLayout)
+
+        viewListCommands = findViewById<RecyclerView>(R.id.allCommandsList)
+        viewListCommands.layoutManager = LinearLayoutManager(this@AllCommands)
+        viewListCommands.itemAnimator = DefaultItemAnimator()
+        customAdapter = CustomRecyclerAdapter(
+            this@AllCommands,
+            allCommands,
+            ::handleFavoriteClick,
+            ::loadCommand
+        )
+
+        viewListCommands.adapter = customAdapter
 
         dbMan = DBDataManager(
             this,
             ::dataOnStartLoad,
             ::loadCommandsData
         )
-
-        viewListCommands.onItemClickListener = loadCommand()
     }
 
     private fun loadDataIntoView(): Unit {
@@ -94,37 +105,29 @@ class AllCommands : AppCompatActivity() {
         }
     }
 
-    private fun loadCommand(): AdapterView.OnItemClickListener {
-        return AdapterView.OnItemClickListener { _, _, pos, _ ->
-            mainScope.launch {
-                val commandSelected = allCommands[pos]
-                val result = Intent()
-                result.putExtra("command", commandSelected.filename)
-                result.putExtra("isFavorite", commandSelected.isFavorite)
-                result.putExtra("idCommand", commandSelected.id)
+    private fun loadCommand(id: Int): Unit {
+        mainScope.launch {
+            val commandSelected = allCommands.find { it.id == id }!!
+            val result = Intent()
+            result.putExtra("command", commandSelected.filename)
+            result.putExtra("isFavorite", commandSelected.isFavorite)
+            result.putExtra("idCommand", commandSelected.id)
 
-                setResult(RESULT_OK, result)
-                finish()
-            }
+            setResult(RESULT_OK, result)
+            finish()
         }
     }
 
+    private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
+        ProUtils.setCommandAsFavorite(this, dbMan, c, v)
+    }
+
     private fun putData(): Unit {
+        customAdapter.setData(allCommands)
         Utils.setViewVisibility(loadingL, View.GONE)
         Utils.setViewVisibility(errorL, View.GONE)
         Utils.setViewVisibility(layoutAllCommands, View.VISIBLE)
 
-        val callback = { c: CommandModelView, v: ImageView ->
-            ProUtils.setCommandAsFavorite(this@AllCommands, dbMan, c, v)
-        }
-
-        val elements: CustomListAdapter = CustomListAdapter(
-            this,
-            allCommands,
-            callback
-        )
-
-        viewListCommands.adapter = elements
     }
 
     fun closeAllCommands(v: View): Unit {

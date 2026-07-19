@@ -16,7 +16,7 @@ package com.srm.whysudo.interfaces
 
 import android.content.Context
 import android.widget.ImageView
-import com.srm.whysudo.adapters.CommandModelView
+import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.utils.DBDataManager
 
 interface ProUtilsInt {

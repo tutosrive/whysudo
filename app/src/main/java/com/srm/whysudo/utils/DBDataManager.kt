@@ -16,7 +16,7 @@ package com.srm.whysudo.utils
 
 import android.content.Context
 import android.database.Cursor
-import com.srm.whysudo.adapters.CommandModelView
+import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.examples.MigrationStub
