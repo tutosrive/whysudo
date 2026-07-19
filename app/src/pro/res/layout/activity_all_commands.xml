@@ -103,7 +103,7 @@
             android:padding="10dp"
             android:visibility="gone">
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/allCommandsList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

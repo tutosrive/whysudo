@@ -169,7 +169,7 @@
 
             </FrameLayout>
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/listCommands"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"

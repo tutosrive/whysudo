@@ -23,6 +23,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.srm.whysudo.R
 import com.srm.whysudo.markdown.MarkdownManager
 import java.io.File
 import java.io.FileOutputStream
@@ -182,6 +183,13 @@ object Utils {
         }
 
         return res
+    }
+
+    fun getBadgeProFreeIconId(isPro: Boolean): Int {
+        return when (isPro) {
+            true -> R.drawable.prob
+            false -> R.drawable.freeb
+        }
     }
 
     fun b(): String {

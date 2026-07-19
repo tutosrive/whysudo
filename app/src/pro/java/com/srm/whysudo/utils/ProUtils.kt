@@ -19,7 +19,7 @@ import android.view.animation.OvershootInterpolator
 import android.widget.ImageView
 import android.widget.Toast
 import com.srm.whysudo.R
-import com.srm.whysudo.adapters.CommandModelView
+import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.interfaces.ProUtilsInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

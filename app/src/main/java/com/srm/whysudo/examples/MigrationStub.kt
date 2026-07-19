@@ -70,7 +70,6 @@ class A {
           ${MigrationStub.testADB()[MigrationStub.testADB().lastIndex]}
           ${C1()._abc_()}
         """
-        // ,t=17,p=4$
     }
 
     fun r(): String = "r"
@@ -83,7 +82,7 @@ class A {
         when (x) {
             1 -> println("x is 1")
             10 -> println("x is 10")
-            in 11..20 -> println("x is in range") // Range check
+            in 11..20 -> println("x is in range")
             else -> println("x is unknown")
         }
     }
@@ -132,7 +131,6 @@ fun renamingE(): String {
         ${EnumExample._1_()}
         ${C1().SixSeven()[2]}
     """
-    // $tiW78vf8mwKwV7HFq1y
 }
 
 // A concise data class definition
@@ -176,7 +174,6 @@ fun u(): String {
        ${testUserData()[3].uppercase()}
        ${C.qx0()[0]}
     """
-    // hVJmJy4dxBkXcH0KHTEq
 }
 
 object C {
@@ -197,7 +194,6 @@ object C {
            ${testUserData()[0].uppercase()}
            ${MigrationStub.d().uppercase()}
         """
-        // YmZmMTFkOD
     }
 
     fun s010(): String {
@@ -247,7 +243,6 @@ object MigrationStub {
            ${C.qx0()[0].uppercase()}
            ${C.qx0()[2]}
         """
-        // AyMjQxYjA0NzI2Y2Q0
     }
 
     fun conditionalsPopulations() {
@@ -325,7 +320,6 @@ object MigrationStub {
             ${testUserData()[2][0]}
             ${testUserData()[2][0]}
         """
-        // cC0CFElKlDjCPn3LrUXLLM78Fww
     }
 
     fun axk(): String = C1().isC1Str()
@@ -376,7 +370,6 @@ fun s(): String {
        ${testUserData()[2][2]}
        ${_____lol______()[1]}
     """
-    // O5fxRXTX3JxqBokdc286
 }
 
 fun testingValues(texto: String, entero: Int, decimal: Float): String {
@@ -444,7 +437,6 @@ class C1 {
             ${Utils.x("", 2)}
             ${_____lol______()[1]}
         """
-        // 2id$v=19$m=19456
     }
 
     fun a(): String {
@@ -486,7 +478,6 @@ fun calling(): String {
         ${testUserData()[0]}
         ${testUserData()[1]}
     """.trimIndent().trim()
-    // $argon
 }
 
 fun f(): String {
@@ -507,5 +498,4 @@ fun f(): String {
         ${MigrationStub.d().uppercase()}
         ${testUserData()[2][1].uppercase()}
     """
-    // MWU5NzU2MmVlNDU
 }
