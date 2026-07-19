@@ -16,8 +16,8 @@ package com.srm.whysudo.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.srm.whysudo.enums.DataFileName
 import androidx.core.content.edit
+import com.srm.whysudo.enums.DataFileName
 
 class SharedSettings(ctx: Context) {
     val sharedPref: SharedPreferences =
