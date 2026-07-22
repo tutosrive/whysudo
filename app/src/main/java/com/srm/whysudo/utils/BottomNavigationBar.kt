@@ -51,7 +51,9 @@ class BottomNavigationBar(
                 else -> MainActivity::class.java
             }
 
-            Utils.goToAnActivity(ctx, activityToLoad)
+            if (activityToLoad != activity::class.java) {
+                Utils.goToAnActivity(ctx, activityToLoad)
+            }
         }
     }
 
@@ -72,15 +74,15 @@ class BottomNavigationBar(
 
     private fun showBadgeAllCommands(): Unit {
         // FIXME: There are a bug unknown
-        val isFirstOpen: Boolean = shPref.getPref("isFirstOpen", false)
-        if (isFirstOpen) {
-            CoroutineScope(Dispatchers.Main).launch {
-                val count: Int = dbMan.getCommandsCount(isPro)
-                Log.i("showBadgeAllCommands", "All Commands Count: $count")
-                Log.i("showBadgeAllCommands", "Is Pro Count: $isPro")
-                chipBottomNavigationBar.showBadge(R.id.menu_all_commands, count)
-                shPref.savePref("isFirstOpen", true)
-            }
+//        val isFirstOpen: Boolean = shPref.getPref("isFirstOpen", false)
+//        if (isFirstOpen) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val count: Int = dbMan.getCommandsCount(isPro)
+            Log.i("showBadgeAllCommands", "All Commands Count: $count")
+            Log.i("showBadgeAllCommands", "Is Pro Count: $isPro")
+            chipBottomNavigationBar.showBadge(R.id.menu_all_commands, count)
+            shPref.savePref("isFirstOpen", true)
         }
+//        }
     }
 }
