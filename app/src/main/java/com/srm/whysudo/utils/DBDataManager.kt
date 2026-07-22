@@ -204,6 +204,32 @@ class DBDataManager(
         }
     }
 
+    suspend fun getFavoritesCount(): Int {
+        return withContext(Dispatchers.IO) {
+            var count: Int = 0
+            val query: String = "SELECT COUNT(is_favorite) from file WHERE is_favorite == ?"
+            db.rawQuery(query, arrayOf("1")).use {
+                it.moveToFirst()
+                count = it.getInt(0)
+            }
+
+            return@withContext count
+        }
+    }
+
+    suspend fun getCommandsCount(isPro: Boolean = false): Int {
+        return withContext(Dispatchers.IO) {
+            var count: Int = 0
+            val query: String = "SELECT COUNT(type_version) FROM file WHERE type_version == ?"
+            db.rawQuery(query, arrayOf(isPro.toString())).use {
+                it.moveToFirst()
+                count = it.getInt(0)
+            }
+
+            return@withContext count
+        }
+    }
+
     fun formatRegex(commandSplit: List<String>): String {
         var reg = ""
         for (word in commandSplit) reg += "$word* "

@@ -36,6 +36,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.adapters.CustomRecyclerAdapter
 import com.srm.whysudo.markdown.MarkdownManager
+import com.srm.whysudo.utils.BottomNavigationBar
 import com.srm.whysudo.utils.BtnDialog
 import com.srm.whysudo.utils.ConfigDialog
 import com.srm.whysudo.utils.CustomDialog
@@ -57,7 +58,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var commandInfoText: RecyclerView
     private lateinit var markman: MarkdownManager
     private lateinit var dbDataManager: DBDataManager
-    private lateinit var footerTxt: TextView
+
+    //    private lateinit var footerTxt: TextView
     private lateinit var commandHintView: TextView
     private lateinit var listCommands: RecyclerView
     private var commandsListValues: List<CommandModelView> = listOf()
@@ -82,13 +84,14 @@ class MainActivity : AppCompatActivity() {
         getViews()
         loadFilesData()
         initialListeners()
+        BottomNavigationBar(this, dbDataManager)
     }
 
     private fun getViews(): Unit {
         ctnInfoText = findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = findViewById<RecyclerView>(R.id.infoTextMainR)
-        footerTxt = findViewById<TextView>(R.id.footerText)
+//        footerTxt = findViewById<TextView>(R.id.footerText)
         btnSeeAllCommands = findViewById<ImageButton>(R.id.allCommandsBtn)
         btnSetFavorite = findViewById<ImageButton>(R.id.btnFavorite)
         commandHintView = findViewById<TextView>(R.id.commandHintDefault)
@@ -106,13 +109,9 @@ class MainActivity : AppCompatActivity() {
         listCommands.adapter = customAdapter
     }
 
-    private fun setRecyclerAdapter(): Unit {
-
-    }
-
     private fun loadFilesData(): Unit {
         markman = MarkdownManager(this)
-        loadFooterDate()
+//        loadFooterDate()
 
         dbDataManager = DBDataManager(
             ctx = this,
@@ -161,10 +160,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadFooterDate() {
-        val footerStr: String = getString(R.string.footer_message)
-        Utils.setFooterContent(footerTxt, footerStr, markman)
-    }
+//    private fun loadFooterDate() {
+//        val footerStr: String = getString(R.string.footer_message)
+//        Utils.setFooterContent(footerTxt, footerStr, markman)
+//    }
 
     private fun addListenerEvent(): Unit {
         mainScope.launch {
@@ -294,7 +293,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun goAbout(v: View): Unit {
-        Utils.goToAnActivity(this, v, About::class.java)
+        Utils.goToAnActivity(this, About::class.java)
     }
 
     private fun goAllCommands(v: View): Unit {

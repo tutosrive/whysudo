@@ -111,4 +111,7 @@ dependencies {
     implementation("io.noties.markwon:core:4.6.2")
     // Source: https://mvnrepository.com/artifact/io.noties.markwon/recycler
     implementation("io.noties.markwon:recycler:4.6.2")
+
+    // Source: https://mvnrepository.com/artifact/com.github.ismaeldivita/chip-navigation-bar
+    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
 }

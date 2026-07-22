@@ -122,7 +122,7 @@ object Utils {
         clipboard.setPrimaryClip(data)
     }
 
-    fun goToAnActivity(ctx: Context, v: View, c: Class<*>): Unit {
+    fun goToAnActivity(ctx: Context, c: Class<*>): Unit {
         val intentActivity = Intent(ctx, c)
         ctx.startActivity(intentActivity)
     }

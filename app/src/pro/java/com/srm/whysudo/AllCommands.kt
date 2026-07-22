@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.adapters.CustomRecyclerAdapter
+import com.srm.whysudo.utils.BottomNavigationBar
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
@@ -77,6 +78,7 @@ class AllCommands : AppCompatActivity() {
             ::dataOnStartLoad,
             ::loadCommandsData
         )
+        BottomNavigationBar(this, dbMan)
     }
 
     private fun loadDataIntoView(): Unit {
