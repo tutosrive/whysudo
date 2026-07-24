@@ -47,6 +47,7 @@ class AllCommands : AppCompatActivity() {
     private lateinit var layoutAllCommands: LinearLayout
     private val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var customAdapter: CustomRecyclerAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -68,7 +69,7 @@ class AllCommands : AppCompatActivity() {
             this@AllCommands,
             allCommands,
             ::handleFavoriteClick,
-            ::loadCommand
+            { loadCommand(it, savedInstanceState) }
         )
 
         viewListCommands.adapter = customAdapter
@@ -78,7 +79,7 @@ class AllCommands : AppCompatActivity() {
             ::dataOnStartLoad,
             ::loadCommandsData
         )
-        BottomNavigationBar(this, dbMan)
+//        BottomNavigationBar.init(this)
     }
 
     private fun loadDataIntoView(): Unit {
@@ -107,10 +108,14 @@ class AllCommands : AppCompatActivity() {
         }
     }
 
-    private fun loadCommand(id: Int): Unit {
+    private fun loadCommand(id: Int, savedInstance: Bundle?): Unit {
+        val previewsActivity = savedInstance?.getString("previousActivity")!!
+        val commandSelected = allCommands.find { it.id == id }!!
+        var result = Intent()
+        if (previewsActivity != "main") {
+            result = Intent(this, MainActivity::class.java)
+        }
         mainScope.launch {
-            val commandSelected = allCommands.find { it.id == id }!!
-            val result = Intent()
             result.putExtra("command", commandSelected.filename)
             result.putExtra("isFavorite", commandSelected.isFavorite)
             result.putExtra("idCommand", commandSelected.id)

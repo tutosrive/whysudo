@@ -17,43 +17,52 @@ package com.srm.whysudo.utils
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.ismaeldivita.chipnavigation.ChipNavigationBar
-import com.srm.whysudo.AllCommands
 import com.srm.whysudo.BuildConfig
-import com.srm.whysudo.MainActivity
 import com.srm.whysudo.R
+import com.srm.whysudo.fragments.HomeFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
 
 class BottomNavigationBar(
     val ctx: Context,
-    val dbMan: DBDataManager
+    val dbMan: DBDataManager,
+    val loadFragment: (id: Int) -> Unit
 ) {
-    val shPref: SharedSettings = SharedSettings(ctx)
-    val activity: Activity = ctx as Activity
-    val chipBottomNavigationBar: ChipNavigationBar = activity.findViewById(R.id.bottom_menu)
+
+    private val shPref: SharedSettings = SharedSettings(ctx)
+    private val activity = ctx as Activity
+    private val chipBottomNavigationBar: ChipNavigationBar = activity.findViewById(R.id.bottom_menu)
     val isPro: Boolean = BuildConfig.FLAVOR == "pro"
 
     init {
-        this.setListeners()
-        this.showBadgesInItem()
+        this.saveInitialCounters().invokeOnCompletion {
+            this.setListeners()
+            this.showBadgesInItem()
+        }
     }
 
-    private fun setListeners(): Unit {
-        // FIXME: There are a bug, load any ativity witout check that ARE in the same activity ...
-        chipBottomNavigationBar.setOnItemSelectedListener { id ->
-            val activityToLoad: Class<out AppCompatActivity> = when (id) {
-                R.id.menu_favorites -> AllCommands::class.java
-                R.id.menu_settings -> AllCommands::class.java
-                R.id.menu_all_commands -> AllCommands::class.java
-                else -> MainActivity::class.java
-            }
 
-            if (activityToLoad != activity::class.java) {
-                Utils.goToAnActivity(ctx, activityToLoad)
-            }
+    private fun saveInitialCounters(): Job {
+        return CoroutineScope(Dispatchers.Main).launch {
+            val favoritesCount: Int = dbMan.getFavoritesCount()
+            val allCommandsCount: Int = dbMan.getCommandsCount(isPro)
+
+            shPref.savePref("commandsCount", allCommandsCount.toFloat())
+            shPref.savePref("favoritesCount", favoritesCount.toFloat())
+        }
+
+    }
+
+    private fun setListeners(
+    ): Unit {
+        chipBottomNavigationBar.setOnItemSelectedListener { id ->
+            loadFragment.invoke(id)
         }
     }
 
@@ -64,11 +73,9 @@ class BottomNavigationBar(
 
     private fun showBadgeFavorites(): Unit {
         if (isPro) {
-            CoroutineScope(Dispatchers.Main).launch {
-                val count: Int = dbMan.getFavoritesCount()
-                Log.i("showBadgeFavorites", "Favorites Count: $count")
-                chipBottomNavigationBar.showBadge(R.id.menu_favorites, count)
-            }
+            val count = shPref.getPref("favoritesCount", 0f)
+            Log.i("showBadgeFavorites", "Favorites Count: $count")
+            chipBottomNavigationBar.showBadge(R.id.menu_favorites, count.toInt())
         }
     }
 
@@ -76,13 +83,12 @@ class BottomNavigationBar(
         // FIXME: There are a bug unknown
 //        val isFirstOpen: Boolean = shPref.getPref("isFirstOpen", false)
 //        if (isFirstOpen) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val count: Int = dbMan.getCommandsCount(isPro)
-            Log.i("showBadgeAllCommands", "All Commands Count: $count")
-            Log.i("showBadgeAllCommands", "Is Pro Count: $isPro")
-            chipBottomNavigationBar.showBadge(R.id.menu_all_commands, count)
-            shPref.savePref("isFirstOpen", true)
-        }
+        val count = shPref.getPref("commandsCount", 0f)
+        Log.i("showBadgeAllCommands", "All Commands Count: $count")
+        Log.i("showBadgeAllCommands", "Is Pro Count: $isPro")
+        chipBottomNavigationBar.showBadge(R.id.menu_all_commands, count.toInt())
+//        shPref.savePref("isFirstOpen", true)
 //        }
     }
+
 }
