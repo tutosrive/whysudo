@@ -17,13 +17,15 @@ package com.srm.whysudo
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
+import android.window.OnBackInvokedDispatcher
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import com.srm.whysudo.fragments.AllCommandsFragment
 import com.srm.whysudo.fragments.HomeFragment
-import com.srm.whysudo.markdown.MarkdownManager
+import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.utils.BottomNavigationBar
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.Utils
@@ -35,8 +37,10 @@ import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
     private var commandClickedId by Delegates.notNull<Int>()
+    private var currentCommand: CommandModelView? = null
     private lateinit var dbMan: DBDataManager
     val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    private lateinit var bottomBarManager: BottomNavigationBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,8 +57,8 @@ class MainActivity : AppCompatActivity() {
         Utils.loadLicensesFiles(this)
         dbMan = DBDataManager(ctx = this)
 
+        bottomBarManager = BottomNavigationBar(this, dbMan, ::loadFragment)
         toggleFragment(homeFragment(), "HOME_F")
-        BottomNavigationBar(this, dbMan, ::loadFragment)
     }
 
     private fun toggleFragment(fragment: Fragment, tag: String): Unit {
@@ -63,28 +67,39 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    fun setCurrentCommand(command: CommandModelView): Unit {
+        this.currentCommand = command
+    }
+
     fun loadFragment(id: Int): Unit {
-        val fragmentToLoad: Pair<String, HomeFragment> = when (id) {
+        val fragmentToLoad: Pair<String, Fragment> = when (id) {
             R.id.menu_favorites -> "HOME_F" to homeFragment()
             R.id.menu_settings -> "HOME_F" to homeFragment()
-            R.id.menu_all_commands -> "HOME_F" to homeFragment()
+            R.id.menu_all_commands -> "ALL_COMMANDS_F" to allCommandsFragment()
             else -> "HOME_F" to homeFragment()
         }
-        val currentFragment: Fragment? = supportFragmentManager
+        val existFragment: Fragment? = supportFragmentManager
             .findFragmentByTag(fragmentToLoad.first)
 
-        if (
-            currentFragment != null &&
-            currentFragment::class.java != fragmentToLoad.second::class.java
-        ) {
+        if (existFragment == null) {
             toggleFragment(fragmentToLoad.second, fragmentToLoad.first)
         } else {
-            Log.i("setListeners", "Is the same fragment: ${currentFragment?.tag}")
+            Log.i("setListeners", "Is the same fragment: ${existFragment.tag}")
         }
     }
 
+    private fun allCommandsFragment(): Fragment {
+        return AllCommandsFragment(
+            this, ::setCurrentCommand,
+            bottomBarManager::updateCounters, bottomBarManager::clickNavigationBar
+        )
+    }
+
     private fun homeFragment(): HomeFragment {
-        return HomeFragment(this, mainScope, { hideKeyboard() })
+        return HomeFragment(
+            this, { hideKeyboard() },
+            bottomBarManager::updateCounters, currentCommand
+        )
     }
 
     override fun onDestroy() {
@@ -92,4 +107,15 @@ class MainActivity : AppCompatActivity() {
         dbMan.close()
         mainScope.cancel()
     }
+
+//    override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
+//        val allFragments = supportFragmentManager.fragments
+//        if (allFragments.isNotEmpty()) {
+//            allFragments.forEach {
+//                supportFragmentManager.beginTransaction().remove(it).commit()
+//            }
+//        }
+//        Log.i("getOnBackInvokedDispatcher", "Back Pressed/Called")
+//        return super.getOnBackInvokedDispatcher()
+//    }
 }

@@ -17,17 +17,13 @@ package com.srm.whysudo.utils
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.ismaeldivita.chipnavigation.ChipNavigationBar
 import com.srm.whysudo.BuildConfig
 import com.srm.whysudo.R
-import com.srm.whysudo.fragments.HomeFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlin.reflect.KClass
 
 class BottomNavigationBar(
     val ctx: Context,
@@ -41,14 +37,14 @@ class BottomNavigationBar(
     val isPro: Boolean = BuildConfig.FLAVOR == "pro"
 
     init {
-        this.saveInitialCounters().invokeOnCompletion {
+        this.saveCounters().invokeOnCompletion {
             this.setListeners()
             this.showBadgesInItem()
         }
     }
 
 
-    private fun saveInitialCounters(): Job {
+    private fun saveCounters(): Job {
         return CoroutineScope(Dispatchers.Main).launch {
             val favoritesCount: Int = dbMan.getFavoritesCount()
             val allCommandsCount: Int = dbMan.getCommandsCount(isPro)
@@ -56,7 +52,12 @@ class BottomNavigationBar(
             shPref.savePref("commandsCount", allCommandsCount.toFloat())
             shPref.savePref("favoritesCount", favoritesCount.toFloat())
         }
+    }
 
+    fun updateCounters(): Unit {
+        this.saveCounters().invokeOnCompletion {
+            showBadgesInItem()
+        }
     }
 
     private fun setListeners(
@@ -64,6 +65,10 @@ class BottomNavigationBar(
         chipBottomNavigationBar.setOnItemSelectedListener { id ->
             loadFragment.invoke(id)
         }
+    }
+
+    fun clickNavigationBar(id: Int): Unit {
+        chipBottomNavigationBar.setItemSelected(id, isSelected = true, dispatchAction = true)
     }
 
     private fun showBadgesInItem(): Unit {

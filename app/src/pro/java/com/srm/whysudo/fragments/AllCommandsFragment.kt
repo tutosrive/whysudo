@@ -12,78 +12,88 @@
  * In no event shall the author be liable for any claim or damages.
  */
 
-package com.srm.whysudo
+package com.srm.whysudo.fragments
 
-import android.content.Intent
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.srm.whysudo.models.CommandModelView
+import com.srm.whysudo.R
 import com.srm.whysudo.adapters.CustomRecyclerAdapter
-import com.srm.whysudo.utils.BottomNavigationBar
+import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class AllCommands : AppCompatActivity() {
+class AllCommandsFragment(
+    val ctx: Context,
+    val setCommand: (c: CommandModelView) -> Unit,
+    val updateBarBadges: () -> Unit,
+    val loadFragment: (id: Int) -> Unit
+) : Fragment() {
     private var allCommands: List<CommandModelView> = listOf()
     private lateinit var dbMan: DBDataManager
     private lateinit var loadingL: LinearLayout
     private lateinit var errorL: LinearLayout
     private lateinit var viewListCommands: RecyclerView
     private lateinit var layoutAllCommands: LinearLayout
+    private lateinit var backBtn: ImageButton
     private lateinit var customAdapter: CustomRecyclerAdapter
-    private val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    private val activity: Activity = ctx as Activity
+    private lateinit var selfCycle: LifecycleCoroutineScope
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_all_commands)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_all_commands, container, false)
+    }
 
-        layoutAllCommands = findViewById<LinearLayout>(R.id.commandsListLayout)
-        loadingL = findViewById<LinearLayout>(R.id.loadingLayout)
-        errorL = findViewById<LinearLayout>(R.id.erroLayout)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        selfCycle = viewLifecycleOwner.lifecycleScope
+        layoutAllCommands = activity.findViewById<LinearLayout>(R.id.commandsListLayout)
+        loadingL = activity.findViewById<LinearLayout>(R.id.loadingLayout)
+        errorL = activity.findViewById<LinearLayout>(R.id.erroLayout)
+        backBtn = activity.findViewById<ImageButton>(R.id.backBtn)
 
-        viewListCommands = findViewById<RecyclerView>(R.id.allCommandsList)
-        viewListCommands.layoutManager = LinearLayoutManager(this@AllCommands)
+        backBtn.setOnClickListener { close() }
+
+        viewListCommands = activity.findViewById<RecyclerView>(R.id.allCommandsList)
+        viewListCommands.layoutManager = LinearLayoutManager(ctx)
         viewListCommands.itemAnimator = DefaultItemAnimator()
         customAdapter = CustomRecyclerAdapter(
-            this@AllCommands,
+            ctx,
             allCommands,
             ::handleFavoriteClick,
-            { loadCommand(it, savedInstanceState) }
+            ::loadCommand
         )
 
         viewListCommands.adapter = customAdapter
 
         dbMan = DBDataManager(
-            this,
+            ctx,
             ::dataOnStartLoad,
             ::loadCommandsData
         )
-//        BottomNavigationBar.init(this)
     }
 
     private fun loadDataIntoView(): Unit {
-        mainScope.launch {
+        selfCycle.launch {
             if (allCommands.isNotEmpty()) {
                 putData()
             } else {
@@ -101,32 +111,23 @@ class AllCommands : AppCompatActivity() {
     }
 
     private fun loadCommandsData(): Unit {
-        mainScope.launch {
+        selfCycle.launch {
             allCommands = dbMan.getAllCommands()
             delay(50)
             dataOnFinishLoad()
         }
     }
 
-    private fun loadCommand(id: Int, savedInstance: Bundle?): Unit {
-        val previewsActivity = savedInstance?.getString("previousActivity")!!
+    private fun loadCommand(id: Int): Unit {
         val commandSelected = allCommands.find { it.id == id }!!
-        var result = Intent()
-        if (previewsActivity != "main") {
-            result = Intent(this, MainActivity::class.java)
-        }
-        mainScope.launch {
-            result.putExtra("command", commandSelected.filename)
-            result.putExtra("isFavorite", commandSelected.isFavorite)
-            result.putExtra("idCommand", commandSelected.id)
-
-            setResult(RESULT_OK, result)
-            finish()
-        }
+        setCommand.invoke(commandSelected)
+        Log.i("loadCommand", commandSelected.filename)
+        close()
     }
 
     private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
-        ProUtils.setCommandAsFavorite(this, dbMan, c, v)
+        ProUtils.setCommandAsFavorite(ctx, dbMan, c, v)
+        updateBarBadges.invoke()
     }
 
     private fun putData(): Unit {
@@ -137,13 +138,12 @@ class AllCommands : AppCompatActivity() {
 
     }
 
-    fun closeAllCommands(v: View): Unit {
-        finish()
+    fun close(): Unit {
+        loadFragment.invoke(R.id.menu_home)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         dbMan.close()
-        mainScope.cancel()
     }
 }

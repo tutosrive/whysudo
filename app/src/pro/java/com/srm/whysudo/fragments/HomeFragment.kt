@@ -29,6 +29,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,19 +47,16 @@ import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 import kotlin.system.exitProcess
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_CONTEXT = "ctx"
-private const val ARG_DBMAN = "dbman"
-
 class HomeFragment(
     val ctx: Context,
-    val mainScope: CoroutineScope,
-    val hideKeyboard: () -> Unit
+    val hideKeyboard: () -> Unit,
+    val updateBarBadges: () -> Unit,
+    val currentCommand: CommandModelView? = null
 ) : Fragment() {
     private lateinit var dbDataManager: DBDataManager
     private var commandClickedId by Delegates.notNull<Int>()
@@ -74,11 +72,13 @@ class HomeFragment(
     private lateinit var btnSeeAllCommands: ImageButton
     private lateinit var btnSetFavorite: ImageButton
     private val activity: Activity = ctx as Activity
+    private lateinit var selfCycle: LifecycleCoroutineScope
 
     private lateinit var customAdapter: CustomRecyclerAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        selfCycle = viewLifecycleOwner.lifecycleScope
         getViews()
         loadFilesData()
         initialListeners()
@@ -88,7 +88,6 @@ class HomeFragment(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
@@ -128,11 +127,12 @@ class HomeFragment(
 //        btnSeeAllCommands.setOnClickListener { v -> goAllCommands() }
         btnSetFavorite.setOnClickListener { v ->
             setFavorite(commandClickedId)
+            updateBarBadges.invoke()
         }
     }
 
     fun setFavorite(idCommand: Int): Unit {
-        mainScope.launch {
+        selfCycle.launch {
             val setFavoriteOk = dbDataManager.saveFavorite(idCommand)
             ProUtils.notifyFavoriteToView(btnSetFavorite, setFavoriteOk)
             ProUtils.showFavoriteSetToast(ctx, setFavoriteOk)
@@ -141,10 +141,11 @@ class HomeFragment(
 
     private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
         ProUtils.setCommandAsFavorite(ctx, dbDataManager, c, v)
+        updateBarBadges.invoke()
     }
 
     private fun handleListItemClick(id: Int): Unit {
-        mainScope.launch {
+        selfCycle.launch {
             val commandSelected: CommandModelView = commandsListValues.find { it.id == id }!!
             commandClickedId = commandSelected.id
             showCommandContent(
@@ -155,7 +156,7 @@ class HomeFragment(
     }
 
     fun loadingStatus(): Unit {
-        mainScope.launch {
+        selfCycle.launch {
             inputCommandSearch.isEnabled = false
             Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
             markman.setMark(getString(R.string.loading_msg), commandHintView)
@@ -163,8 +164,13 @@ class HomeFragment(
     }
 
     private fun addListenerEvent(): Unit {
-        mainScope.launch {
-            showDefaultCommandHint()
+        selfCycle.launch {
+            if (currentCommand == null) {
+                showDefaultCommandHint()
+            } else {
+                commandClickedId = currentCommand.id
+                showCommandContent(currentCommand.filename, currentCommand.isFavorite)
+            }
             inputCommandSearch.isEnabled = true
             inputCommandSearch.hint = getString(R.string.input_search_main_hint)
             inputCommandSearch.doOnTextChanged { text, _, before, count ->
@@ -174,7 +180,7 @@ class HomeFragment(
     }
 
     fun showDefaultError(): Unit {
-        mainScope.launch {
+        selfCycle.launch {
             val msg = getString(R.string.general_error)
             val title = getString(R.string.error_dialog_title)
             val exit = { exitProcess(0) }
@@ -201,7 +207,7 @@ class HomeFragment(
         var fileNames: List<CommandModelView>? = null
         val command: String = (text ?: "").trim().toString()
         when {
-            !command.isEmpty() -> mainScope.launch {
+            !command.isEmpty() -> selfCycle.launch {
                 if (!command.isEmpty()) {
                     fileNames = getCommandData(command)
                 }
@@ -209,7 +215,7 @@ class HomeFragment(
             }
 
             else -> {
-                mainScope.launch { showDefaultCommandHint() }
+                selfCycle.launch { showDefaultCommandHint() }
             }
         }
     }
@@ -305,11 +311,11 @@ class HomeFragment(
 //        waitResult.launch(intent)
 //    }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        dbDataManager.close()
-//        mainScope.cancel()
-//    }
+    override fun onDestroy() {
+        super.onDestroy()
+        dbDataManager.close()
+        selfCycle.cancel()
+    }
 
 //    companion object {
 //        @JvmStatic
