@@ -17,7 +17,6 @@ package com.srm.whysudo
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
-import android.window.OnBackInvokedDispatcher
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -33,10 +32,8 @@ import com.srm.whysudo.utils.Utils.hideKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
-    private var commandClickedId by Delegates.notNull<Int>()
     private var currentCommand: CommandModelView? = null
     private lateinit var dbMan: DBDataManager
     val mainScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
@@ -73,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
     fun loadFragment(id: Int): Unit {
         val fragmentToLoad: Pair<String, Fragment> = when (id) {
-            R.id.menu_favorites -> "HOME_F" to homeFragment()
+            R.id.menu_favorites -> "FAVORITES_F" to favoriteCommandsFragment()
             R.id.menu_settings -> "HOME_F" to homeFragment()
             R.id.menu_all_commands -> "ALL_COMMANDS_F" to allCommandsFragment()
             else -> "HOME_F" to homeFragment()
@@ -82,6 +79,7 @@ class MainActivity : AppCompatActivity() {
             .findFragmentByTag(fragmentToLoad.first)
 
         if (existFragment == null) {
+//            supportFragmentManager.beginTransaction().remove(existFragment).commit()
             toggleFragment(fragmentToLoad.second, fragmentToLoad.first)
         } else {
             Log.i("setListeners", "Is the same fragment: ${existFragment.tag}")
@@ -90,8 +88,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun allCommandsFragment(): Fragment {
         return AllCommandsFragment(
-            this, ::setCurrentCommand,
-            bottomBarManager::updateCounters, bottomBarManager::clickNavigationBar
+            this, bottomBarManager::updateCounters,
+            bottomBarManager::clickNavigationBar, ::setCurrentCommand
+        )
+    }
+
+    private fun favoriteCommandsFragment(): Fragment {
+        return AllCommandsFragment(
+            this, bottomBarManager::updateCounters,
+            bottomBarManager::clickNavigationBar, ::setCurrentCommand, true
         )
     }
 
@@ -107,15 +112,4 @@ class MainActivity : AppCompatActivity() {
         dbMan.close()
         mainScope.cancel()
     }
-
-//    override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
-//        val allFragments = supportFragmentManager.fragments
-//        if (allFragments.isNotEmpty()) {
-//            allFragments.forEach {
-//                supportFragmentManager.beginTransaction().remove(it).commit()
-//            }
-//        }
-//        Log.i("getOnBackInvokedDispatcher", "Back Pressed/Called")
-//        return super.getOnBackInvokedDispatcher()
-//    }
 }

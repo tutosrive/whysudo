@@ -41,9 +41,10 @@ import kotlinx.coroutines.launch
 
 class AllCommandsFragment(
     val ctx: Context,
-    val setCommand: (c: CommandModelView) -> Unit,
     val updateBarBadges: () -> Unit,
-    val loadFragment: (id: Int) -> Unit
+    val loadFragment: (id: Int) -> Unit,
+    val setCommand: ((c: CommandModelView) -> Unit),
+    val isLoadFavorites: Boolean = false
 ) : Fragment() {
     private var allCommands: List<CommandModelView> = listOf()
     private lateinit var dbMan: DBDataManager
@@ -112,7 +113,10 @@ class AllCommandsFragment(
 
     private fun loadCommandsData(): Unit {
         selfCycle.launch {
-            allCommands = dbMan.getAllCommands()
+            allCommands = when (isLoadFavorites) {
+                true -> dbMan.getFavoritesCommands()
+                false -> dbMan.getAllCommands()
+            }
             delay(50)
             dataOnFinishLoad()
         }

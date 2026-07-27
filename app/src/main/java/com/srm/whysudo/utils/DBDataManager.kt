@@ -16,6 +16,7 @@ package com.srm.whysudo.utils
 
 import android.content.Context
 import android.database.Cursor
+import android.util.Log
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.examples.MigrationStub
@@ -161,17 +162,36 @@ class DBDataManager(
 
     suspend fun getAllCommands(): List<CommandModelView> {
         return withContext(Dispatchers.IO) {
-            val filenames: MutableList<CommandModelView> = mutableListOf()
+            val commands: MutableList<CommandModelView> = mutableListOf()
             val query = """SELECT F.id, filename, is_pro, is_favorite FROM file F
                     INNER JOIN version V ON F.type_version = V.id"""
             db.rawQuery(query).use {
                 while (it.moveToNext()) {
                     val command: CommandModelView = makeCommandObj(it)
-                    filenames.add(command)
+                    commands.add(command)
                 }
                 it.close()
             }
-            return@withContext filenames
+            return@withContext commands
+        }
+    }
+
+    suspend fun getFavoritesCommands(): List<CommandModelView> {
+        return withContext(Dispatchers.IO) {
+            val favoriteCommands = mutableListOf<CommandModelView>()
+            val query: String =
+                "SELECT id, filename, type_version, is_favorite FROM file WHERE is_favorite = ?"
+            db.rawQuery(query, arrayOf("1")).use {
+                while (it.moveToNext()) {
+                    val command: CommandModelView = makeCommandObj(it)
+                    favoriteCommands.add(command)
+                }
+            }
+            Log.i("getFavoritesCommands", favoriteCommands.joinToString(","))
+            favoriteCommands.sortWith(
+                compareByDescending<CommandModelView> { it.filename }.reversed()
+            )
+            return@withContext favoriteCommands
         }
     }
 
