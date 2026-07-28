@@ -122,7 +122,7 @@ class DBDataManager(
         }
     }
 
-    private fun makeCommandObj(res: Cursor): CommandModelView {
+    private fun makeCommandObj(res: Cursor, hasContent: Boolean = false): CommandModelView {
         val id = res.getInt(0)
         val name = res.getString(1)
         val type = Utils.intToBoolean(
@@ -131,9 +131,14 @@ class DBDataManager(
         val favorite = Utils.intToBoolean(
             res.getInt(3)
         )
+        var content: String? = null
+
+        if (hasContent) {
+            content = res.getString(4)
+        }
         val obj: CommandModelView = CommandModelView(
             id, name,
-            type, favorite
+            type, favorite, content
         )
         return obj
     }
@@ -201,7 +206,6 @@ class DBDataManager(
                     favoriteCommands.add(command)
                 }
             }
-            Log.i("getFavoritesCommands", favoriteCommands.joinToString(","))
             favoriteCommands.sortWith(
                 compareByDescending<CommandModelView> { it.filename }.reversed()
             )
@@ -209,17 +213,19 @@ class DBDataManager(
         }
     }
 
-    suspend fun getCommandById(id: Int, lang: String = "en"): String {
+    suspend fun getCommandById(id: Int, lang: String = "en"): CommandModelView {
         return withContext(Dispatchers.IO) {
-            val query = """SELECT $lang FROM content_language C
-                inner join file F on C.id = F.id_data WHERE C.id = ?"""
-            var content = ""
+            val query =
+                """SELECT F.id, filename, type_version, is_favorite, $lang FROM content_language C 
+                inner join file F on C.id = F.id_data WHERE F.id = ?"""
+            val command = mutableListOf<CommandModelView>()
             db.rawQuery(query, arrayOf(id.toString())).use {
                 it.moveToFirst()
-                content = it.getString(0)
+                val model = makeCommandObj(it, true)
+                command.add(model)
             }
 
-            return@withContext content
+            return@withContext command.first()
         }
     }
 

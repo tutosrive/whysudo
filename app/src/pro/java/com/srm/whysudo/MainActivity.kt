@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadStartState(): Unit {
         bottomBarManager = BottomNavigationBar(this, dbMan, ::loadFragment)
+//        bottomBarManager.clickNavigationBar(R.id.menu_home)
         toggleFragment(homeFragment(), "HOME_F")
     }
 

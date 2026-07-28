@@ -40,6 +40,9 @@ object ProUtils : ProUtilsInt {
     ): Job {
         return CoroutineScope(Dispatchers.Main).launch {
             val id: Int = command.id
+//            if (command.isFavorite) {
+//                println("Sure you want remove ${command.filename} from favorites?")
+//            }
             command.isFavorite = db.saveFavorite(id)
             if (command.isFavorite) {
                 notifyFavoriteToView(view, true)

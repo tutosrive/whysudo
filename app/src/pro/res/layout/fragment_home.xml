@@ -28,24 +28,6 @@
         android:scaleType="center"
         app:srcCompat="@mipmap/ic_launcher_foreground" />
 
-    <ImageButton
-        android:id="@+id/allCommandsBtn"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="end"
-        android:layout_marginEnd="50dp"
-        android:backgroundTint="#00FFFFFF"
-        android:contentDescription="@string/description_btn_go_all_commands"
-        app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
-
-    <ImageButton
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="end"
-        android:backgroundTint="#00FFFFFF"
-        android:contentDescription="@string/about_btn_description"
-        app:srcCompat="@android:drawable/ic_menu_info_details" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -18,5 +18,6 @@ data class CommandModelView(
     var id: Int,
     var filename: String,
     var typeVersion: Boolean,
-    var isFavorite: Boolean
+    var isFavorite: Boolean,
+    var content: String? = null
 )
