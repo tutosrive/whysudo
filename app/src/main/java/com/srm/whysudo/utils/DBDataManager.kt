@@ -23,6 +23,7 @@ import com.srm.whysudo.examples.MigrationStub
 import com.srm.whysudo.models.CommandModelView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.zetetic.database.sqlcipher.SQLiteDatabase
@@ -61,9 +62,22 @@ class DBDataManager(
 
             job.invokeOnCompletion {
                 try {
-                    val job2 = CoroutineScope(Dispatchers.IO).launch {
-                        dbMan = DbManager(fileDataName, ctx, qr)
+//                    val job2 = CoroutineScope(Dispatchers.IO).launch {
+//                        dbMan = DbManager(fileDataName, ctx, qr)
+//                    }
+//                    job2.invokeOnCompletion {
+//                        db = dbMan.conn
+//                        callbackOnFinishLoad?.invoke()
+//                    }
+                    dbMan = DbManager(fileDataName, ctx, qr)
+                    val job2: Job = CoroutineScope(Dispatchers.IO).launch {
+                        val starterJob = dbMan.handleStarter()
+                        starterJob?.join()
+                        if (starterJob != null) {
+                            sharedPref.savePref("favorite_col_created", true)
+                        }
                     }
+
                     job2.invokeOnCompletion {
                         db = dbMan.conn
                         callbackOnFinishLoad?.invoke()
@@ -227,7 +241,7 @@ class DBDataManager(
     suspend fun getFavoritesCount(): Int {
         return withContext(Dispatchers.IO) {
             var count: Int = 0
-            val query: String = "SELECT COUNT(is_favorite) from file WHERE is_favorite == ?"
+            val query: String = "SELECT COUNT(is_favorite) from file WHERE is_favorite = ?"
             db.rawQuery(query, arrayOf("1")).use {
                 it.moveToFirst()
                 count = it.getInt(0)
@@ -240,8 +254,9 @@ class DBDataManager(
     suspend fun getCommandsCount(isPro: Boolean = false): Int {
         return withContext(Dispatchers.IO) {
             var count: Int = 0
-            val query: String = "SELECT COUNT(type_version) FROM file WHERE type_version == ?"
-            db.rawQuery(query, arrayOf(isPro.toString())).use {
+            val valueIsPro: Int = if (isPro) 1 else 0
+            val query: String = "SELECT COUNT(type_version) FROM file WHERE type_version = ?"
+            db.rawQuery(query, arrayOf(valueIsPro.toString())).use {
                 it.moveToFirst()
                 count = it.getInt(0)
             }

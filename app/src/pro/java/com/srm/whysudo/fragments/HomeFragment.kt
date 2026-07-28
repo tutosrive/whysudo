@@ -135,13 +135,13 @@ class HomeFragment(
         selfCycle.launch {
             val setFavoriteOk = dbDataManager.saveFavorite(idCommand)
             ProUtils.notifyFavoriteToView(btnSetFavorite, setFavoriteOk)
-            ProUtils.showFavoriteSetToast(ctx, setFavoriteOk)
         }
     }
 
     private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
-        ProUtils.setCommandAsFavorite(ctx, dbDataManager, c, v)
-        updateBarBadges.invoke()
+        ProUtils.setCommandAsFavorite(ctx, dbDataManager, c, v).invokeOnCompletion {
+            updateBarBadges.invoke()
+        }
     }
 
     private fun handleListItemClick(id: Int): Unit {

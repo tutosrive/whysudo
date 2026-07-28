@@ -45,7 +45,7 @@ class BottomNavigationBar(
 
 
     private fun saveCounters(): Job {
-        return CoroutineScope(Dispatchers.Main).launch {
+        return CoroutineScope(Dispatchers.IO).launch {
             val favoritesCount: Int = dbMan.getFavoritesCount()
             val allCommandsCount: Int = dbMan.getCommandsCount(isPro)
 
@@ -56,7 +56,7 @@ class BottomNavigationBar(
 
     fun updateCounters(): Unit {
         this.saveCounters().invokeOnCompletion {
-            showBadgesInItem()
+            showBadgeFavorites()
         }
     }
 
@@ -85,15 +85,10 @@ class BottomNavigationBar(
     }
 
     private fun showBadgeAllCommands(): Unit {
-        // FIXME: There are a bug unknown
-//        val isFirstOpen: Boolean = shPref.getPref("isFirstOpen", false)
-//        if (isFirstOpen) {
         val count = shPref.getPref("commandsCount", 0f)
         Log.i("showBadgeAllCommands", "All Commands Count: $count")
         Log.i("showBadgeAllCommands", "Is Pro Count: $isPro")
         chipBottomNavigationBar.showBadge(R.id.menu_all_commands, count.toInt())
-//        shPref.savePref("isFirstOpen", true)
-//        }
     }
 
 }

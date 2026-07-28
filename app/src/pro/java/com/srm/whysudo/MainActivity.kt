@@ -52,8 +52,10 @@ class MainActivity : AppCompatActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         Utils.loadLicensesFiles(this)
-        dbMan = DBDataManager(ctx = this)
+        dbMan = DBDataManager(ctx = this, callbackOnFinishLoad = ::loadStartState)
+    }
 
+    private fun loadStartState(): Unit {
         bottomBarManager = BottomNavigationBar(this, dbMan, ::loadFragment)
         toggleFragment(homeFragment(), "HOME_F")
     }

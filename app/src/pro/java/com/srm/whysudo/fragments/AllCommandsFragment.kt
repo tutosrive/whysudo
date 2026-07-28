@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -36,6 +37,7 @@ import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -53,8 +55,9 @@ class AllCommandsFragment(
     private lateinit var viewListCommands: RecyclerView
     private lateinit var layoutAllCommands: LinearLayout
     private lateinit var backBtn: ImageButton
+    private lateinit var titleFragment: TextView
+    private lateinit var errorView: TextView
     private lateinit var customAdapter: CustomRecyclerAdapter
-    private val activity: Activity = ctx as Activity
     private lateinit var selfCycle: LifecycleCoroutineScope
 
     override fun onCreateView(
@@ -67,14 +70,51 @@ class AllCommandsFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         selfCycle = viewLifecycleOwner.lifecycleScope
-        layoutAllCommands = activity.findViewById<LinearLayout>(R.id.commandsListLayout)
-        loadingL = activity.findViewById<LinearLayout>(R.id.loadingLayout)
-        errorL = activity.findViewById<LinearLayout>(R.id.erroLayout)
-        backBtn = activity.findViewById<ImageButton>(R.id.backBtn)
+        getViews(view)
+        setTitle()
+        dbMan = DBDataManager(
+            ctx,
+            ::dataOnStartLoad,
+            ::loadCommandsData
+        )
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        dbMan.close()
+    }
+
+    private fun setTitle(): Unit {
+        val titleId: Int = when (isLoadFavorites) {
+            true -> R.string.title_all_commands_activity
+            false -> R.string.title_favorites_f
+        }
+        titleFragment.text = getString(titleId)
+    }
+
+    private fun loadDataIntoView(): Unit {
+        selfCycle.launch {
+            if (allCommands.isNotEmpty()) {
+                putData()
+            } else {
+                Utils.setViewVisibility(errorL, View.VISIBLE)
+                errorView.text = getString(R.string.msg_favorites_null_f)
+            }
+        }
+    }
+
+    private fun getViews(v: View): Unit {
+        layoutAllCommands = v.findViewById<LinearLayout>(R.id.commandsListLayout)
+        loadingL = v.findViewById<LinearLayout>(R.id.loadingLayout)
+        errorL = v.findViewById<LinearLayout>(R.id.erroLayout)
+        backBtn = v.findViewById<ImageButton>(R.id.backBtn)
+        titleFragment = v.findViewById<TextView>(R.id.allCommandsTitle)
+        errorView = v.findViewById<TextView>(R.id.errorTextView)
 
         backBtn.setOnClickListener { close() }
 
-        viewListCommands = activity.findViewById<RecyclerView>(R.id.allCommandsList)
+        viewListCommands = v.findViewById<RecyclerView>(R.id.allCommandsList)
         viewListCommands.layoutManager = LinearLayoutManager(ctx)
         viewListCommands.itemAnimator = DefaultItemAnimator()
         customAdapter = CustomRecyclerAdapter(
@@ -85,22 +125,6 @@ class AllCommandsFragment(
         )
 
         viewListCommands.adapter = customAdapter
-
-        dbMan = DBDataManager(
-            ctx,
-            ::dataOnStartLoad,
-            ::loadCommandsData
-        )
-    }
-
-    private fun loadDataIntoView(): Unit {
-        selfCycle.launch {
-            if (allCommands.isNotEmpty()) {
-                putData()
-            } else {
-                Utils.setViewVisibility(errorL, View.VISIBLE)
-            }
-        }
     }
 
     private fun dataOnStartLoad(): Unit {
@@ -117,7 +141,7 @@ class AllCommandsFragment(
                 true -> dbMan.getFavoritesCommands()
                 false -> dbMan.getAllCommands()
             }
-            delay(50)
+//            delay(50)
             dataOnFinishLoad()
         }
     }
@@ -130,8 +154,12 @@ class AllCommandsFragment(
     }
 
     private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
-        ProUtils.setCommandAsFavorite(ctx, dbMan, c, v)
-        updateBarBadges.invoke()
+        // Would to use a general function on MainAcivity, and in this fragment, just call to
+        // "setCommand(c)" and the callback from Main ... like this: "handleFavorite.invoke(v)"
+        // would be because MainActivity has ctx and a dbMan ... just sent the command "c" and view "v"
+        ProUtils.setCommandAsFavorite(ctx, dbMan, c, v).invokeOnCompletion {
+            updateBarBadges.invoke()
+        }
     }
 
     private fun putData(): Unit {
@@ -149,5 +177,6 @@ class AllCommandsFragment(
     override fun onDestroy() {
         super.onDestroy()
         dbMan.close()
+//        parentFragmentManager.beginTransaction().remove(this).commit()
     }
 }

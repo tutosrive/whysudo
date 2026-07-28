@@ -23,6 +23,7 @@ import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.interfaces.ProUtilsInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 object ProUtils : ProUtilsInt {
@@ -36,13 +37,13 @@ object ProUtils : ProUtilsInt {
         db: DBDataManager,
         command: CommandModelView,
         view: ImageView
-    ): Unit {
-        CoroutineScope(Dispatchers.Main).launch {
+    ): Job {
+        return CoroutineScope(Dispatchers.Main).launch {
             val id: Int = command.id
             command.isFavorite = db.saveFavorite(id)
             if (command.isFavorite) {
                 notifyFavoriteToView(view, true)
-                showFavoriteSetToast(ctx, true)
+//                showFavoriteSetToast(ctx, true)
             } else {
                 showFavoriteSetToast(ctx, false)
             }

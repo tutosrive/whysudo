@@ -19,6 +19,6 @@
     <string name="description_btn_favorite">Set a command as favorite.</string>
     <string name="msg_favorite_error">Something wrong when try set this command as favorite.</string>
     <string name="msg_favorite_set_ok">Command marked as favorite!</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="msg_favorites_null_f">You don\'t have any favorite</string>
+    <string name="title_favorites_f">Favorites Commands</string>
 </resources>

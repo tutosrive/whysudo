@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-val versionApp = "0.2.9"
+val versionApp = "0.3.0"
 
 base {
     archivesName.set("WhySudo-v$versionApp")
