@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.0"
+agp = "9.1.1"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -11,6 +11,7 @@ constraintlayout = "2.1.4"
 preference = "1.2.0"
 legacySupportV4 = "1.0.0"
 recyclerview = "1.4.0"
+fragment = "1.8.9"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -24,6 +25,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

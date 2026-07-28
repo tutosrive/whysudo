@@ -18,12 +18,13 @@ import android.content.Context
 import android.widget.ImageView
 import com.srm.whysudo.models.CommandModelView
 import com.srm.whysudo.utils.DBDataManager
+import kotlinx.coroutines.Job
 
 interface ProUtilsInt {
     fun toggleFavoriteIcon(imageViewer: ImageView, isFavorite: Boolean): Unit
     fun setCommandAsFavorite(
         ctx: Context, db: DBDataManager, command: CommandModelView, view: ImageView
-    ): Unit
+    ): Job
 
     fun showFavoriteSetToast(ctx: Context, isOk: Boolean): Unit
     fun showToast(ctx: Context, msg: String): Unit

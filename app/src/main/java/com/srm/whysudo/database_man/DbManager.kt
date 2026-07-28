@@ -18,6 +18,7 @@ import android.content.Context
 import com.srm.whysudo.utils.SharedSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.zetetic.database.sqlcipher.SQLiteConnection
 import net.zetetic.database.sqlcipher.SQLiteDatabase
@@ -42,23 +43,27 @@ class DbManager(dbName: String, ctx: Context, qr: String) {
             null, SQLiteDatabase.OPEN_READWRITE,
             hook
         )
-        handleStarter()
+//        handleStarter()
     }
 
     fun close() {
         conn.close()
     }
 
-    private fun handleStarter(): Unit {
-        CoroutineScope(Dispatchers.IO).launch {
-            val isFavoriteColCreated: Boolean = shPref.getPref(
-                "favorite_col_created", false
-            )
-            if (!isFavoriteColCreated) {
-                DbStarter(conn).startDb().invokeOnCompletion {
-                    shPref.savePref("favorite_col_created", true)
-                }
-            }
+    suspend fun handleStarter(): Job? {
+//      return  CoroutineScope(Dispatchers.IO).launch {
+        var job: Job? = null
+        val isFavoriteColCreated: Boolean = shPref.getPref(
+            "favorite_col_created", false
+        )
+        if (!isFavoriteColCreated) {
+            job = DbStarter(conn).startDb()
+//                DbStarter(conn).startDb().invokeOnCompletion {
+//                    shPref.savePref("favorite_col_created", true)
+//                }
         }
+
+        return job
+//        }
     }
 }

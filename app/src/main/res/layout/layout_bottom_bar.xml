@@ -12,25 +12,10 @@
   ~ In no event shall the author be liable for any claim or damages.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/stacked_waves_haikei_pruple"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
-
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/mainContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_menu"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="match_parent">
 
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/bottom_menu"
@@ -43,9 +28,5 @@
         app:cnb_addLeftInset="true"
         app:cnb_addRightInset="true"
         app:cnb_menuResource="@menu/bottom_bar"
-        app:cnb_orientationMode="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:cnb_orientationMode="horizontal" />
+</RelativeLayout>

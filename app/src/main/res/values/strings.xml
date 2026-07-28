@@ -44,4 +44,8 @@
     <string name="error_dialog_title">Something went wrong</string>
     <string name="btn_dialog_close">Close</string>
     <string name="description_badge_command_pro_free">Badge image to show PRO or FREE</string>
+    <string name="label_home">Home</string>
+    <string name="label_all_commands">All Commands</string>
+    <string name="label_favorites">Favorites</string>
+    <string name="label_settings">Settings</string>
 </resources>

@@ -16,12 +16,14 @@ package com.srm.whysudo.utils
 
 import android.content.Context
 import android.database.Cursor
+import android.util.Log
 import com.srm.whysudo.database_man.DbManager
 import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.examples.MigrationStub
 import com.srm.whysudo.models.CommandModelView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.zetetic.database.sqlcipher.SQLiteDatabase
@@ -60,9 +62,22 @@ class DBDataManager(
 
             job.invokeOnCompletion {
                 try {
-                    val job2 = CoroutineScope(Dispatchers.IO).launch {
-                        dbMan = DbManager(fileDataName, ctx, qr)
+//                    val job2 = CoroutineScope(Dispatchers.IO).launch {
+//                        dbMan = DbManager(fileDataName, ctx, qr)
+//                    }
+//                    job2.invokeOnCompletion {
+//                        db = dbMan.conn
+//                        callbackOnFinishLoad?.invoke()
+//                    }
+                    dbMan = DbManager(fileDataName, ctx, qr)
+                    val job2: Job = CoroutineScope(Dispatchers.IO).launch {
+                        val starterJob = dbMan.handleStarter()
+                        starterJob?.join()
+                        if (starterJob != null) {
+                            sharedPref.savePref("favorite_col_created", true)
+                        }
                     }
+
                     job2.invokeOnCompletion {
                         db = dbMan.conn
                         callbackOnFinishLoad?.invoke()
@@ -161,17 +176,36 @@ class DBDataManager(
 
     suspend fun getAllCommands(): List<CommandModelView> {
         return withContext(Dispatchers.IO) {
-            val filenames: MutableList<CommandModelView> = mutableListOf()
+            val commands: MutableList<CommandModelView> = mutableListOf()
             val query = """SELECT F.id, filename, is_pro, is_favorite FROM file F
                     INNER JOIN version V ON F.type_version = V.id"""
             db.rawQuery(query).use {
                 while (it.moveToNext()) {
                     val command: CommandModelView = makeCommandObj(it)
-                    filenames.add(command)
+                    commands.add(command)
                 }
                 it.close()
             }
-            return@withContext filenames
+            return@withContext commands
+        }
+    }
+
+    suspend fun getFavoritesCommands(): List<CommandModelView> {
+        return withContext(Dispatchers.IO) {
+            val favoriteCommands = mutableListOf<CommandModelView>()
+            val query: String =
+                "SELECT id, filename, type_version, is_favorite FROM file WHERE is_favorite = ?"
+            db.rawQuery(query, arrayOf("1")).use {
+                while (it.moveToNext()) {
+                    val command: CommandModelView = makeCommandObj(it)
+                    favoriteCommands.add(command)
+                }
+            }
+            Log.i("getFavoritesCommands", favoriteCommands.joinToString(","))
+            favoriteCommands.sortWith(
+                compareByDescending<CommandModelView> { it.filename }.reversed()
+            )
+            return@withContext favoriteCommands
         }
     }
 
@@ -201,6 +235,33 @@ class DBDataManager(
                 isOK = Utils.intToBoolean(it.getInt(0))
             }
             return@withContext isOK
+        }
+    }
+
+    suspend fun getFavoritesCount(): Int {
+        return withContext(Dispatchers.IO) {
+            var count: Int = 0
+            val query: String = "SELECT COUNT(is_favorite) from file WHERE is_favorite = ?"
+            db.rawQuery(query, arrayOf("1")).use {
+                it.moveToFirst()
+                count = it.getInt(0)
+            }
+
+            return@withContext count
+        }
+    }
+
+    suspend fun getCommandsCount(isPro: Boolean = false): Int {
+        return withContext(Dispatchers.IO) {
+            var count: Int = 0
+            val valueIsPro: Int = if (isPro) 1 else 0
+            val query: String = "SELECT COUNT(type_version) FROM file WHERE type_version = ?"
+            db.rawQuery(query, arrayOf(valueIsPro.toString())).use {
+                it.moveToFirst()
+                count = it.getInt(0)
+            }
+
+            return@withContext count
         }
     }
 

@@ -29,6 +29,7 @@ import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
 import com.srm.whysudo.enums.DataFileName
 import com.srm.whysudo.markdown.MarkdownManager
+import com.srm.whysudo.utils.BottomNavigationBar
 import com.srm.whysudo.utils.RawDataManager
 import com.srm.whysudo.utils.Utils
 import kotlinx.coroutines.CoroutineScope
@@ -76,6 +77,7 @@ class About : AppCompatActivity() {
 
         loadFooterInfo()
         loadInfoAbout()
+//        BottomNavigationBar.init(this)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
