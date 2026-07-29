@@ -38,6 +38,11 @@ class CustomRecyclerAdapter(
         notifyDataSetChanged()
     }
 
+    fun getItemPosition(id: Int): Int {
+        val command = this.commandsList.find { it.id == id }!!
+        return this.commandsList.indexOf(command)
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

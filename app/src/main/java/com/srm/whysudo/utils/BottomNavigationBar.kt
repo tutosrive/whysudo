@@ -23,6 +23,7 @@ import com.srm.whysudo.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class BottomNavigationBar(
@@ -79,16 +80,23 @@ class BottomNavigationBar(
     private fun showBadgeFavorites(): Unit {
         if (isPro) {
             val count = shPref.getPref("favoritesCount", 0f)
-            Log.i("showBadgeFavorites", "Favorites Count: $count")
             chipBottomNavigationBar.showBadge(R.id.menu_favorites, count.toInt())
+            CoroutineScope(Dispatchers.Main).launch {
+                dismissBadge(R.id.menu_favorites)
+            }
         }
     }
 
     private fun showBadgeAllCommands(): Unit {
         val count = shPref.getPref("commandsCount", 0f)
-        Log.i("showBadgeAllCommands", "All Commands Count: $count")
-        Log.i("showBadgeAllCommands", "Is Pro Count: $isPro")
         chipBottomNavigationBar.showBadge(R.id.menu_all_commands, count.toInt())
+        CoroutineScope(Dispatchers.Main).launch {
+            dismissBadge(R.id.menu_all_commands)
+        }
     }
 
+    private suspend fun dismissBadge(id: Int): Unit {
+        delay(2000)
+        chipBottomNavigationBar.dismissBadge(id)
+    }
 }

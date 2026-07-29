@@ -15,9 +15,7 @@
 package com.srm.whysudo.fragments
 
 import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,8 +23,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -35,7 +31,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
-import com.srm.whysudo.About
 import com.srm.whysudo.R
 import com.srm.whysudo.adapters.CustomRecyclerAdapter
 import com.srm.whysudo.markdown.MarkdownManager
@@ -64,12 +59,11 @@ class HomeFragment(
     private lateinit var ctnInfoText: View
     private lateinit var commandInfoText: RecyclerView
     private lateinit var markman: MarkdownManager
-
-    //    private lateinit var footerTxt: TextView
+    private lateinit var currentCommandLocal: CommandModelView
+    private lateinit var currentCommandContent: String
     private lateinit var commandHintView: TextView
     private lateinit var listCommands: RecyclerView
     private var commandsListValues: List<CommandModelView> = listOf()
-    private lateinit var btnSeeAllCommands: ImageButton
     private lateinit var btnSetFavorite: ImageButton
     private val activity: Activity = ctx as Activity
     private lateinit var selfCycle: LifecycleCoroutineScope
@@ -95,8 +89,6 @@ class HomeFragment(
         ctnInfoText = activity.findViewById<View>(R.id.ctnInfoText)
         inputCommandSearch = activity.findViewById<TextInputEditText>(R.id.searchInp)
         commandInfoText = activity.findViewById<RecyclerView>(R.id.infoTextMainR)
-//        footerTxt = findViewById<TextView>(R.id.footerText)
-        btnSeeAllCommands = activity.findViewById<ImageButton>(R.id.allCommandsBtn)
         btnSetFavorite = activity.findViewById<ImageButton>(R.id.btnFavorite)
         commandHintView = activity.findViewById<TextView>(R.id.commandHintDefault)
         listCommands = activity.findViewById<RecyclerView>(R.id.listCommands)
@@ -124,33 +116,30 @@ class HomeFragment(
     }
 
     private fun initialListeners(): Unit {
-//        btnSeeAllCommands.setOnClickListener { v -> goAllCommands() }
         btnSetFavorite.setOnClickListener { v ->
-            setFavorite(commandClickedId)
-            updateBarBadges.invoke()
-        }
-    }
-
-    fun setFavorite(idCommand: Int): Unit {
-        selfCycle.launch {
-            val setFavoriteOk = dbDataManager.saveFavorite(idCommand)
-            ProUtils.notifyFavoriteToView(btnSetFavorite, setFavoriteOk)
+            handleFavoriteClick(currentCommandLocal, v as ImageView)
         }
     }
 
     private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
-        ProUtils.setCommandAsFavorite(ctx, dbDataManager, c, v).invokeOnCompletion {
-            updateBarBadges.invoke()
+        if (c.isFavorite) {
+            val callback = {
+                ProUtils.unsetCommandAsFavorite(ctx, dbDataManager, c, v).invokeOnCompletion {
+                    updateBarBadges.invoke()
+                }
+            }
+            ProUtils.showDialogRemoveFavoriteConfirm(ctx, callback)
+        } else {
+            ProUtils.setCommandAsFavorite(ctx, dbDataManager, c, v).invokeOnCompletion {
+                updateBarBadges.invoke()
+            }
         }
     }
 
     private fun handleListItemClick(id: Int): Unit {
         selfCycle.launch {
-            val commandSelected: CommandModelView = commandsListValues.find { it.id == id }!!
-            commandClickedId = commandSelected.id
-            showCommandContent(
-                commandSelected.filename, commandSelected.isFavorite
-            )
+            currentCommandLocal = commandsListValues.find { it.id == id }!!
+            showCommandContent()
             hideKeyboard()
         }
     }
@@ -168,8 +157,8 @@ class HomeFragment(
             if (currentCommand == null) {
                 showDefaultCommandHint()
             } else {
-                commandClickedId = currentCommand.id
-                showCommandContent(currentCommand.filename, currentCommand.isFavorite)
+                currentCommandLocal = currentCommand
+                showCommandContent()
             }
             inputCommandSearch.isEnabled = true
             inputCommandSearch.hint = getString(R.string.input_search_main_hint)
@@ -196,11 +185,6 @@ class HomeFragment(
             CustomDialog(ctx, config)
         }
     }
-
-//    private fun loadFooterDate() {
-//        val footerStr: String = getString(R.string.footer_message)
-//        Utils.setFooterContent(footerTxt, footerStr, markman)
-//    }
 
 
     private fun changeRealTimeText(text: CharSequence?, before: Int, count: Int) {
@@ -239,8 +223,8 @@ class HomeFragment(
         filenames.size.let {
             when (it) {
                 1 -> {
-                    val selected = filenames[0]
-                    showCommandContent(selected.filename, selected.isFavorite)
+                    currentCommandLocal = filenames[0]
+                    showCommandContent()
                 }
 
                 in 2..it -> showCommandList(filenames)
@@ -249,13 +233,16 @@ class HomeFragment(
         }
     }
 
-    private suspend fun showCommandContent(name: String, isFavorite: Boolean): Unit {
+    private suspend fun showCommandContent(): Unit {
         Utils.setViewVisibility(listCommands, View.INVISIBLE)
         Utils.setViewVisibility(ctnInfoText, View.VISIBLE)
         Utils.setViewVisibility(commandHintView, View.GONE)
-        val content = dbDataManager.getCommandContent(name)
+        val content = dbDataManager.getCommandContent(currentCommandLocal.filename)
         markman.setMark(content)
-        ProUtils.notifyFavoriteToView(btnSetFavorite, isFavorite, false)
+        ProUtils.notifyFavoriteToView(
+            btnSetFavorite,
+            currentCommandLocal.isFavorite, false
+        )
     }
 
     private fun showCommandList(list: List<CommandModelView>): Unit {
@@ -272,57 +259,25 @@ class HomeFragment(
         val placeholderDefault = getString(R.string.hint_main_info_command)
         val noteMsg = getString(R.string.default_command_note_header)
         val msg = "${placeholderDefault}\n---\n${noteMsg}\n---\n"
-        val randomCommand = getRandomCommand()
+        getRandomCommand()
         markman.setMark(msg, commandHintView)
-        markman.setMark(randomCommand)
-        ProUtils.notifyFavoriteToView(btnSetFavorite, isFavorite = false, animate = false)
+        markman.setMark(currentCommandContent)
+        ProUtils.notifyFavoriteToView(
+            btnSetFavorite,
+            isFavorite = currentCommandLocal.isFavorite,
+            animate = false
+        )
     }
 
-    private suspend fun getRandomCommand(): String {
+    private suspend fun getRandomCommand(): Unit {
         commandClickedId = Utils.getRandomIdInt()
-        val command = dbDataManager.getCommandById(commandClickedId)
-        return command
+        currentCommandLocal = dbDataManager.getCommandById(commandClickedId)
+        currentCommandContent = currentCommandLocal.content!!
     }
-
-
-    private fun waitAllcomandsResult(): ActivityResultLauncher<Intent?> {
-        return registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val data = result.data
-                val command = data?.getStringExtra("command")
-                val favorite = data?.getBooleanExtra("isFavorite", false) ?: false
-                commandClickedId = data?.getIntExtra("idCommand", -1)!!
-                lifecycleScope.launch {
-                    showCommandContent("$command", favorite)
-                }
-            }
-        }
-    }
-
-    fun goAbout(): Unit {
-        Utils.goToAnActivity(ctx, About::class.java)
-    }
-
-//    private fun goAllCommands(): Unit {
-//        val intent = Intent(ctx, AllCommands::class.java)
-//        intent.putExtra("previousActivity", "main")
-//        waitResult.launch(intent)
-//    }
 
     override fun onDestroy() {
         super.onDestroy()
         dbDataManager.close()
         selfCycle.cancel()
     }
-
-//    companion object {
-//        @JvmStatic
-//        fun newInstance(ctx: Context, dbMan: DBDataManager) =
-//            HomeFragment().apply {
-//                arguments = Bundle().apply {
-//                }
-//            }
-//    }
 }
