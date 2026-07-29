@@ -15,30 +15,31 @@
 package com.srm.whysudo.utils
 
 import android.content.Context
-import android.text.Spanned
 import androidx.appcompat.app.AlertDialog
-import com.srm.whysudo.markdown.MarkdownManager
+import androidx.appcompat.content.res.AppCompatResources
+import com.srm.whysudo.R
+import kotlinx.coroutines.withContext
 
-class BtnDialog(val text: String, val callback: (() -> Unit)?)
+class BtnDialog(val text: String, val callback: (() -> Any)? = null)
 
 class ConfigDialog(
     val msg: String,
     val title: String,
     val buttonAccept: BtnDialog? = null,
     val buttonClose: BtnDialog? = null,
-    val callbackOnDismiss: (() -> Unit)? = null
+    val callbackOnDismiss: (() -> Unit)? = null,
+    var iconDrawableId: Int = R.drawable.ic_info
 )
 
 class CustomDialog(ctx: Context, val configDialog: ConfigDialog) {
     var builder = AlertDialog.Builder(ctx)
 
     init {
+        val drawable = AppCompatResources.getDrawable(ctx, configDialog.iconDrawableId)
+        builder.setIcon(drawable)
         builder.setTitle(configDialog.title)
-        val msg: Spanned = MarkdownManager(ctx).mark.toMarkdown(configDialog.msg)
-        builder.setMessage(msg)
-
+        builder.setMessage(configDialog.msg)
         makeButtons()
-
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
@@ -46,7 +47,7 @@ class CustomDialog(ctx: Context, val configDialog: ConfigDialog) {
     private fun makeButtons() {
         if (configDialog.buttonAccept != null) {
             val text: String = configDialog.buttonAccept.text
-            builder.setNegativeButton(text) { dialog, _ ->
+            builder.setPositiveButton(text) { dialog, _ ->
                 if (configDialog.buttonAccept.callback == null) {
                     dialog.dismiss()
                 } else {

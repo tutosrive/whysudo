@@ -21,4 +21,6 @@
     <string name="msg_favorite_set_ok">Command marked as favorite!</string>
     <string name="msg_favorites_null_f">You don\'t have any favorite</string>
     <string name="title_favorites_f">Favorites Commands</string>
+    <string name="title_dialog_remove_favorite">Remove Favourite</string>
+    <string name="msg_dialog_remove_favorite">Are you sure you want to remove the command from your favourites?</string>
 </resources>

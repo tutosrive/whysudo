@@ -40,17 +40,47 @@ object ProUtils : ProUtilsInt {
     ): Job {
         return CoroutineScope(Dispatchers.Main).launch {
             val id: Int = command.id
-//            if (command.isFavorite) {
-//                println("Sure you want remove ${command.filename} from favorites?")
-//            }
-            command.isFavorite = db.saveFavorite(id)
+            command.isFavorite = db.saveFavorite(id, 1)
             if (command.isFavorite) {
                 notifyFavoriteToView(view, true)
-//                showFavoriteSetToast(ctx, true)
             } else {
                 showFavoriteSetToast(ctx, false)
             }
         }
+    }
+
+    fun unsetCommandAsFavorite(
+        ctx: Context,
+        db: DBDataManager,
+        command: CommandModelView,
+        view: ImageView
+    ): Job {
+        return CoroutineScope(Dispatchers.Main).launch {
+            val id: Int = command.id
+            command.isFavorite = db.saveFavorite(id, 0)
+            if (!command.isFavorite) {
+                notifyFavoriteToView(view, false)
+            } else {
+                showFavoriteSetToast(ctx, false)
+            }
+        }
+    }
+
+    fun showDialogRemoveFavoriteConfirm(ctx: Context, callbackAccept: () -> Any): Unit {
+        val msg: String = ctx.getString(R.string.msg_dialog_remove_favorite)
+        val title: String = ctx.getString(R.string.title_dialog_remove_favorite)
+        val btnAcceptLabel: String = ctx.getString(R.string.label_btn_accept_remove)
+        val btnCloseLabel: String = ctx.getString(R.string.label_btn_close)
+        val btnAccept: BtnDialog = BtnDialog(btnAcceptLabel, callback = callbackAccept)
+        val btnClose: BtnDialog = BtnDialog(btnCloseLabel)
+        val configDialog: ConfigDialog = ConfigDialog(
+            msg = msg,
+            title = title,
+            buttonAccept = btnAccept,
+            buttonClose = btnClose,
+            iconDrawableId = R.drawable.ic_star_filled_with_x
+        )
+        CustomDialog(ctx, configDialog)
     }
 
     override fun showFavoriteSetToast(ctx: Context, isOk: Boolean): Unit {

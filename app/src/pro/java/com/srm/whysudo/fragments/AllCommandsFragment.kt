@@ -99,6 +99,7 @@ class AllCommandsFragment(
                 putData()
             } else {
                 Utils.setViewVisibility(errorL, View.VISIBLE)
+                Utils.setViewVisibility(viewListCommands, View.GONE)
                 errorView.text = getString(R.string.msg_favorites_null_f)
             }
         }
@@ -141,7 +142,6 @@ class AllCommandsFragment(
                 true -> dbMan.getFavoritesCommands()
                 false -> dbMan.getAllCommands()
             }
-//            delay(50)
             dataOnFinishLoad()
         }
     }
@@ -157,13 +157,28 @@ class AllCommandsFragment(
         // Would to use a general function on MainAcivity, and in this fragment, just call to
         // "setCommand(c)" and the callback from Main ... like this: "handleFavorite.invoke(v)"
         // would be because MainActivity has ctx and a dbMan ... just sent the command "c" and view "v"
-        ProUtils.setCommandAsFavorite(ctx, dbMan, c, v).invokeOnCompletion {
-            updateBarBadges.invoke()
+        if (c.isFavorite) {
+            val callback = {
+                ProUtils.unsetCommandAsFavorite(ctx, dbMan, c, v).invokeOnCompletion {
+                    if (isLoadFavorites) {
+                        loadCommandsData()
+                        val positionChanged = customAdapter.getItemPosition(c.id)
+                        customAdapter.notifyItemChanged(positionChanged)
+                    }
+                    updateBarBadges.invoke()
+                }
+            }
+            ProUtils.showDialogRemoveFavoriteConfirm(ctx, callback)
+        } else {
+            ProUtils.setCommandAsFavorite(ctx, dbMan, c, v).invokeOnCompletion {
+                updateBarBadges.invoke()
+            }
         }
     }
 
     private fun putData(): Unit {
         customAdapter.setData(allCommands)
+        Utils.setViewVisibility(viewListCommands, View.VISIBLE)
         Utils.setViewVisibility(loadingL, View.GONE)
         Utils.setViewVisibility(errorL, View.GONE)
         Utils.setViewVisibility(layoutAllCommands, View.VISIBLE)
@@ -177,6 +192,5 @@ class AllCommandsFragment(
     override fun onDestroy() {
         super.onDestroy()
         dbMan.close()
-//        parentFragmentManager.beginTransaction().remove(this).commit()
     }
 }

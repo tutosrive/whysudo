@@ -41,6 +41,7 @@ import com.srm.whysudo.utils.CustomDialog
 import com.srm.whysudo.utils.DBDataManager
 import com.srm.whysudo.utils.ProUtils
 import com.srm.whysudo.utils.Utils
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
@@ -121,8 +122,17 @@ class HomeFragment(
     }
 
     private fun handleFavoriteClick(c: CommandModelView, v: ImageView): Unit {
-        ProUtils.setCommandAsFavorite(ctx, dbDataManager, c, v).invokeOnCompletion {
-            updateBarBadges.invoke()
+        if (c.isFavorite) {
+            val callback = {
+                ProUtils.unsetCommandAsFavorite(ctx, dbDataManager, c, v).invokeOnCompletion {
+                    updateBarBadges.invoke()
+                }
+            }
+            ProUtils.showDialogRemoveFavoriteConfirm(ctx, callback)
+        } else {
+            ProUtils.setCommandAsFavorite(ctx, dbDataManager, c, v).invokeOnCompletion {
+                updateBarBadges.invoke()
+            }
         }
     }
 

@@ -229,14 +229,14 @@ class DBDataManager(
         }
     }
 
-    suspend fun saveFavorite(id: Int): Boolean {
+    suspend fun saveFavorite(id: Int, isFavorite: Int): Boolean {
         return withContext(Dispatchers.IO) {
-            val queryUpdate: String = "UPDATE file SET is_favorite = 1 WHERE id = ?"
+            val queryUpdate: String = "UPDATE file SET is_favorite = ? WHERE id = ?"
             val queryGet: String = "SELECT is_favorite FROM file WHERE id = ?"
             var isOK = false
-            val paramId = arrayOf(id.toString())
-            db.execSQL(queryUpdate, paramId)
-            db.rawQuery(queryGet, paramId).use {
+            val paramsBinding = arrayOf(isFavorite.toString(), id.toString())
+            db.execSQL(queryUpdate, paramsBinding)
+            db.rawQuery(queryGet, arrayOf(id.toString())).use {
                 it.moveToFirst()
                 isOK = Utils.intToBoolean(it.getInt(0))
             }
