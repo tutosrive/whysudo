@@ -1,7 +1,7 @@
 # Why Sudo?
 
 > [!IMPORTANT]
-> Keep tabs on us! We've got some exciting new features in the pipeline. Drop a ⭐️ on the repository to ensure you catch the latest releases.
+> Keep tabs on me! I've got some exciting new features in the pipeline. Drop a ⭐️ on the repository to ensure you catch the latest releases.
 
 > [!NOTE]
 > This application is currently in *Beta Development*.
