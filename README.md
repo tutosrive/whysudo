@@ -37,6 +37,13 @@ That is exactly why **Why Sudo?** was created: a reference guide for `1,990+ Lin
 * Copy commands to the clipboard
 * Lightning-fast loading speeds
 
+## Previews
+
+https://github.com/user-attachments/assets/ddb5bf4e-7a45-4bb5-89e9-9532f89f76dc
+
+https://github.com/user-attachments/assets/ef98b109-5ad7-4999-ab99-37b2de624e27
+
+
 ## Licence
 
 Licensed under AGPL-3 because I want it to remain free. I invested a lot of time in its development, and its usage cannot be PRIVATISED...
