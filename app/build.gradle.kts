@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-val versionApp = "0.3.0"
+val versionApp = "0.3.1"
 
 base {
     archivesName.set("WhySudo-v$versionApp")
@@ -107,12 +107,11 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/androidx.sqlite/sqlite
     implementation("androidx.sqlite:sqlite:2.6.2")
     implementation("net.zetetic:sqlcipher-android:4.14.0@aar")
-
     // Source: https://mvnrepository.com/artifact/io.noties.markwon/core
     implementation("io.noties.markwon:core:4.6.2")
     // Source: https://mvnrepository.com/artifact/io.noties.markwon/recycler
     implementation("io.noties.markwon:recycler:4.6.2")
-
     // Source: https://mvnrepository.com/artifact/com.github.ismaeldivita/chip-navigation-bar
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
+    
 }
