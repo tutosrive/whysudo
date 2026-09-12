@@ -1,5 +1,7 @@
 # Why Sudo?
 
+[![Download whysudo](https://img.shields.io/sourceforge/dt/whysudo.svg)](https://sourceforge.net/projects/whysudo/files/latest/download)
+
 > [!IMPORTANT]
 > Keep tabs on me! I've got some exciting new features in the pipeline. Drop a ⭐️ on the repository to ensure you catch the latest releases.
 
